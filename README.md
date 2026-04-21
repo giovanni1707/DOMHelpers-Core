@@ -171,4 +171,4 @@ None of this knowledge expires. It is not tied to a compiler version, a framewor
 ## Links
 
 - [GitHub Repository](https://github.com/giovanni1707/DOMHelpers-Core)
-- [DOMHelpers Reactive](https://giovanni1707.github.io/DOMHelpers-Reactive/)
+- [DOMHelpers Reactive](https://github.com/DOMHelpers-Js/reactive/)
