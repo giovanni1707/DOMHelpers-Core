@@ -523,7 +523,7 @@ nav: [
       },
 
 
-          { text: "DOMHelpers Reactive", link: "https://giovanni1707.github.io/DOMHelpers-Reactive/" },
+          { text: "DOMHelpers Reactive", link: "https://domhelpers-js.github.io/reactive/" },
  
 
      ],
