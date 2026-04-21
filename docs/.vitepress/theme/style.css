@@ -1,0 +1,111 @@
+﻿/*   Green Vue-style Theme   */
+:root {
+  --vp-c-brand-1: #41b883;
+  --vp-c-brand-2: #339970;
+  --vp-c-brand-3: #2c8f63;
+
+  --vp-c-text-link: var(--vp-c-brand-1);
+  --vp-c-text-link-hover: var(--vp-c-brand-2);
+
+  --vp-button-brand-bg: var(--vp-c-brand-1);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-active-bg: var(--vp-c-brand-3);
+}
+
+/* Typography */
+body {
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  line-height: 1.6;
+}
+
+/* Hero Section */
+.hero {
+  max-width: 720px;
+  margin: 60px auto;
+  text-align: center;
+}
+
+.hero h1 {
+  font-size: 3rem;
+  color: var(--vp-c-brand-1);
+}
+
+.hero p {
+  font-size: 1.25rem;
+  margin-top: 1rem;
+}
+
+/* Buttons */
+.vp-button-brand {
+  background-color: var(--vp-button-brand-bg);
+  color: white;
+  padding: 0.5em 1em;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.vp-button-brand:hover {
+  background-color: var(--vp-button-brand-hover-bg);
+}
+
+/* Code blocks */
+pre {
+  border-radius: 8px;
+  font-size: 0.975rem;
+}
+
+code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.975rem;
+}
+
+
+
+
+.creator {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap; /* responsive */
+}
+
+.creator-photo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #43434970; /* optional colored border */
+}
+
+.creator-info h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #1f2937; /* dark text */
+}
+
+.creator-info p {
+  margin: 0.25rem 0;
+  color: #4b5563; /* gray text */
+  line-height: 1.4;
+}
+
+@media (max-width: 600px) {
+  .creator {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .creator-photo {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+
+.VPNavBarTitle .title::after {
+  content: 'Core';
+  color: #41b883;
+  -webkit-text-fill-color: #41b883f3;
+  margin-left: 0.25em;  /* Add space with margin */
+}
