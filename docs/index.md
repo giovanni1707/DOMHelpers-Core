@@ -7,7 +7,7 @@ hero:
   text: Declarative DOM Manipulation, powered by JavaScript
   tagline: No frameworks. No build tools. Just JavaScript with superpowers.
   image:
-    src: /logo.png
+    src: /logo-3.png
     alt: DOM Helpers
   actions:
     - theme: brand
