@@ -12,7 +12,7 @@ hero:
   actions:
     - theme: brand
       text: Get Started
-      link: /getting-started/what-is-dom-helpers-core
+      link: /getting-started/01_what-is-dom-helpers-core
     - theme: alt
       text: Why DOM Helpers?
       link: /getting-started/learning-philosophy
