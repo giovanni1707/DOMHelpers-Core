@@ -67,14 +67,14 @@ autoSave(todos, 'my-todos')
    └── effect(() => { getValue(todos); save(); })
    ↓
 7️⃣ Attaches methods to todos:
-   ├── todos.$save()
-   ├── todos.$load()
-   ├── todos.$clear()
-   ├── todos.$exists()
-   ├── todos.$stopAutoSave()
-   ├── todos.$startAutoSave()
-   ├── todos.$destroy()
-   └── todos.$storageInfo()
+   ├── todos.save()
+   ├── todos.load()
+   ├── todos.clear()
+   ├── todos.exists()
+   ├── todos.stopAutoSave()
+   ├── todos.startAutoSave()
+   ├── todos.destroy()
+   └── todos.storageInfo()
    ↓
 8️⃣ Returns the reactive object (todos)
 ```
@@ -136,8 +136,8 @@ Is it a collection? (has .items)
 Is it a form? (has .values)
    → return { values, errors, touched }
 
-Is it a state? (has .$raw)
-   → return obj.$raw
+Is it a state? (has .raw)
+   → return obj.raw
 
 Otherwise:
    → return obj
@@ -344,7 +344,7 @@ const state = state({
 });
 ```
 
-### ❌ Forgetting to call $destroy when removing dynamic components
+### ❌ Forgetting to call destroy when removing dynamic components
 
 ```javascript
 // ❌ Event listeners and effects leak
@@ -355,7 +355,7 @@ function createWidget() {
 }
 // Widget is removed, but the effect and listeners are still active
 
-// ✅ Call $destroy when done
+// ✅ Call destroy when done
 function createWidget() {
   const state = state({ count: 0 });
   autoSave(state, 'widget');
@@ -364,7 +364,7 @@ function createWidget() {
 
 const widget = createWidget();
 // Later, when removing:
-widget.$destroy();  // Cleans up effect, storage listener, unload listener
+widget.destroy();  // Cleans up effect, storage listener, unload listener
 ```
 
 ---
@@ -377,7 +377,7 @@ widget.$destroy();  // Cleans up effect, storage listener, unload listener
 4. **Save throttle** — minimum 100ms between saves as a safety net
 5. **Flush on unload** — pending debounced saves are flushed when the tab closes
 6. **StorageWrapper** wraps data with `{ value, timestamp, expires }` for expiration support
-7. **Methods added** — `$save`, `$load`, `$clear`, `$exists`, `$destroy`, etc.
+7. **Methods added** — `save`, `load`, `clear`, `exists`, `destroy`, etc.
 
 ---
 

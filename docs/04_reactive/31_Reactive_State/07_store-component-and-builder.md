@@ -174,15 +174,15 @@ myComponent.increment();
 myComponent.setName('Alice');
 
 // Destroy the component — stops all effects, watchers, bindings
-myComponent.$destroy();
+myComponent.destroy();
 ```
 
-### The $destroy() method
+### The destroy() method
 
-Every component gets a `$destroy()` method that cleans up all watchers, effects, and bindings, then calls the `unmounted` hook:
+Every component gets a `destroy()` method that cleans up all watchers, effects, and bindings, then calls the `unmounted` hook:
 
 ```javascript
-myComponent.$destroy();
+myComponent.destroy();
 // 1. All effects stopped
 // 2. All watchers stopped
 // 3. All bindings removed
@@ -200,7 +200,7 @@ myComponent.$destroy();
 | `bindings` | `object` | `{ selector: binding }` — DOM bindings |
 | `actions` | `object` | `{ name: function(state, ...args) }` — methods |
 | `mounted` | `function` | Called after component is created |
-| `unmounted` | `function` | Called when `$destroy()` is invoked |
+| `unmounted` | `function` | Called when `destroy()` is invoked |
 
 ---
 
@@ -357,7 +357,7 @@ Also available as `ReactiveUtils.builder()` — same function.
 2. **component()** — everything: state, computed, watch, effects, bindings, actions, lifecycle
 3. **reactive()** — chainable builder, finalize with `.build()`
 4. **Actions** receive state as the first argument automatically
-5. **$destroy()** cleans up all watchers, effects, and bindings
+5. **destroy()** cleans up all watchers, effects, and bindings
 6. **Choose based on complexity** — start simple, graduate to more structure as needed
 
 ---

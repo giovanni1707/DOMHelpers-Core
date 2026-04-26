@@ -29,7 +29,7 @@ console.log(state.name);   // 'Bob'
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$set(updates)` |
+| **Instance equivalent** | `state.set(updates)` |
 | **Parameters** | `state` — reactive state, `updates` — object with values or functions |
 | **Returns** | The state |
 
@@ -55,7 +55,7 @@ state.count = 2;  // Nothing logged — effects are disposed
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$cleanup()` |
+| **Instance equivalent** | `state.cleanup()` |
 | **Parameters** | `state` — reactive state |
 | **Returns** | `undefined` |
 
@@ -87,7 +87,7 @@ ReactiveUtils.getRaw(state)
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$raw` (property, not method) |
+| **Instance equivalent** | `state.raw` (property, not method) |
 | **Parameters** | `state` — reactive state |
 | **Returns** | The raw object |
 
@@ -113,7 +113,7 @@ console.log(users.isSuccess);  // true
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `asyncState.$execute(fn)` |
+| **Instance equivalent** | `asyncState.execute(fn)` |
 | **Parameters** | `asyncState` — async reactive state, `fn` — async function receiving AbortSignal |
 | **Returns** | Promise with `{ success, data/error/stale/aborted }` |
 
@@ -139,7 +139,7 @@ console.log(users.loading);  // false
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `asyncState.$abort()` |
+| **Instance equivalent** | `asyncState.abort()` |
 | **Parameters** | `asyncState` — async reactive state |
 | **Returns** | `undefined` |
 
@@ -163,7 +163,7 @@ console.log(users.error);     // null
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `asyncState.$reset()` |
+| **Instance equivalent** | `asyncState.reset()` |
 | **Parameters** | `asyncState` — async reactive state |
 | **Returns** | `undefined` |
 
@@ -171,7 +171,7 @@ console.log(users.error);     // null
 
 ### ReactiveUtils.refetch(asyncState)
 
-Re-runs the last function passed to `$execute`.
+Re-runs the last function passed to `execute`.
 
 ```javascript
 const users = asyncState([]);
@@ -187,7 +187,7 @@ await ReactiveUtils.refetch(users);
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `asyncState.$refetch()` |
+| **Instance equivalent** | `asyncState.refetch()` |
 | **Parameters** | `asyncState` — async reactive state |
 | **Returns** | Promise (or `undefined` if no previous function) |
 
@@ -216,7 +216,7 @@ ReactiveUtils.destroy(counter);
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `component.$destroy()` |
+| **Instance equivalent** | `component.destroy()` |
 | **Parameters** | `component` — reactive component |
 | **Returns** | `undefined` |
 
@@ -240,7 +240,7 @@ ReactiveUtils.save(state);
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$save()` |
+| **Instance equivalent** | `state.save()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | `true` on success, `false` on error |
 
@@ -257,7 +257,7 @@ console.log(state.theme);  // Loaded from localStorage
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$load()` |
+| **Instance equivalent** | `state.load()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | `true` if data was found, `false` if not |
 
@@ -274,7 +274,7 @@ ReactiveUtils.clear(state);
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$clear()` |
+| **Instance equivalent** | `state.clear()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | `true` on success, `false` on error |
 
@@ -292,7 +292,7 @@ if (ReactiveUtils.exists(state)) {
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$exists()` |
+| **Instance equivalent** | `state.exists()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | `true` or `false` |
 
@@ -312,7 +312,7 @@ ReactiveUtils.startAutoSave(state);
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$stopAutoSave()` |
+| **Instance equivalent** | `state.stopAutoSave()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | The state |
 
@@ -329,7 +329,7 @@ state.count = 100;  // Saved again
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$startAutoSave()` |
+| **Instance equivalent** | `state.startAutoSave()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | The state |
 
@@ -354,7 +354,7 @@ console.log(info);
 
 | | Details |
 |---|---|
-| **Instance equivalent** | `state.$storageInfo()` |
+| **Instance equivalent** | `state.storageInfo()` |
 | **Parameters** | `state` — storage-enabled reactive state |
 | **Returns** | Object with key, namespace, storage, exists, size, sizeKB |
 
@@ -364,21 +364,21 @@ console.log(info);
 
 | Namespace Method | Instance Equivalent | Category |
 |-----------------|-------------------|----------|
-| `ReactiveUtils.set(state, updates)` | `state.$set(updates)` | Core |
-| `ReactiveUtils.cleanup(state)` | `state.$cleanup()` | Core |
-| `ReactiveUtils.getRaw(state)` | `state.$raw` | Core |
-| `ReactiveUtils.execute(async, fn)` | `asyncState.$execute(fn)` | Async |
-| `ReactiveUtils.abort(async)` | `asyncState.$abort()` | Async |
-| `ReactiveUtils.reset(async)` | `asyncState.$reset()` | Async |
-| `ReactiveUtils.refetch(async)` | `asyncState.$refetch()` | Async |
-| `ReactiveUtils.destroy(comp)` | `component.$destroy()` | Component |
-| `ReactiveUtils.save(state)` | `state.$save()` | Storage |
-| `ReactiveUtils.load(state)` | `state.$load()` | Storage |
-| `ReactiveUtils.clear(state)` | `state.$clear()` | Storage |
-| `ReactiveUtils.exists(state)` | `state.$exists()` | Storage |
-| `ReactiveUtils.stopAutoSave(state)` | `state.$stopAutoSave()` | Storage |
-| `ReactiveUtils.startAutoSave(state)` | `state.$startAutoSave()` | Storage |
-| `ReactiveUtils.storageInfo(state)` | `state.$storageInfo()` | Storage |
+| `ReactiveUtils.set(state, updates)` | `state.set(updates)` | Core |
+| `ReactiveUtils.cleanup(state)` | `state.cleanup()` | Core |
+| `ReactiveUtils.getRaw(state)` | `state.raw` | Core |
+| `ReactiveUtils.execute(async, fn)` | `asyncState.execute(fn)` | Async |
+| `ReactiveUtils.abort(async)` | `asyncState.abort()` | Async |
+| `ReactiveUtils.reset(async)` | `asyncState.reset()` | Async |
+| `ReactiveUtils.refetch(async)` | `asyncState.refetch()` | Async |
+| `ReactiveUtils.destroy(comp)` | `component.destroy()` | Component |
+| `ReactiveUtils.save(state)` | `state.save()` | Storage |
+| `ReactiveUtils.load(state)` | `state.load()` | Storage |
+| `ReactiveUtils.clear(state)` | `state.clear()` | Storage |
+| `ReactiveUtils.exists(state)` | `state.exists()` | Storage |
+| `ReactiveUtils.stopAutoSave(state)` | `state.stopAutoSave()` | Storage |
+| `ReactiveUtils.startAutoSave(state)` | `state.startAutoSave()` | Storage |
+| `ReactiveUtils.storageInfo(state)` | `state.storageInfo()` | Storage |
 
 ---
 
@@ -390,11 +390,11 @@ Every namespace method validates its arguments before calling the instance metho
 const plainObject = { count: 0 };  // NOT a reactive state
 
 ReactiveUtils.save(plainObject);
-// Console: [Namespace Methods] Invalid state or $save not available
+// Console: [Namespace Methods] Invalid state or save not available
 // Returns: false (no crash)
 
 ReactiveUtils.cleanup(plainObject);
-// Console: [Namespace Methods] Invalid state or $cleanup not available
+// Console: [Namespace Methods] Invalid state or cleanup not available
 // Returns: undefined (no crash)
 ```
 

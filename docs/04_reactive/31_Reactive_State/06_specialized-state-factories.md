@@ -13,9 +13,9 @@ The reactive module provides purpose-built factories for common patterns. Instea
 | Factory | What it creates | Built-in properties | Built-in methods |
 |---------|----------------|--------------------|--------------------|
 | `ref()` | Single value wrapper | `.value` | `.valueOf()`, `.toString()` |
-| `collection()` | Reactive list | `.items` | `$add`, `$remove`, `$update`, `$clear` |
-| `form()` | Form state | `.values`, `.errors`, `.touched`, `.isSubmitting` | `$setValue`, `$setError`, `$reset` |
-| `async()` | Async operation state | `.data`, `.loading`, `.error` | `$execute`, `$reset` |
+| `collection()` | Reactive list | `.items` | `add`, `remove`, `update`, `clear` |
+| `form()` | Form state | `.values`, `.errors`, `.touched`, `.isSubmitting` | `setValue`, `setError`, `reset` |
+| `async()` | Async operation state | `.data`, `.loading`, `.error` | `execute`, `reset` |
 
 ---
 
@@ -114,46 +114,46 @@ console.log(todos.items.length);  // 2
 console.log(todos.items[0].text); // 'Learn Reactive'
 ```
 
-### $add() — Add an item
+### add() — Add an item
 
 ```javascript
-todos.$add({ id: 3, text: 'Deploy', done: false });
+todos.add({ id: 3, text: 'Deploy', done: false });
 console.log(todos.items.length);  // 3
 ```
 
-### $remove() — Remove an item
+### remove() — Remove an item
 
 By reference:
 ```javascript
 const item = todos.items[0];
-todos.$remove(item);
+todos.remove(item);
 ```
 
 By predicate function:
 ```javascript
-todos.$remove(item => item.id === 2);
+todos.remove(item => item.id === 2);
 ```
 
-### $update() — Update an item
+### update() — Update an item
 
 By reference:
 ```javascript
 const item = todos.items[0];
-todos.$update(item, { done: true });
+todos.update(item, { done: true });
 ```
 
 By predicate function:
 ```javascript
-todos.$update(
+todos.update(
   item => item.id === 1,
   { done: true, text: 'Learn Reactive (done!)' }
 );
 ```
 
-### $clear() — Remove all items
+### clear() — Remove all items
 
 ```javascript
-todos.$clear();
+todos.clear();
 console.log(todos.items.length);  // 0
 ```
 
@@ -163,18 +163,18 @@ console.log(todos.items.length);  // 0
 const todos = collection();
 
 // Add items
-todos.$add({ id: 1, text: 'Buy groceries', done: false });
-todos.$add({ id: 2, text: 'Clean house', done: false });
-todos.$add({ id: 3, text: 'Walk dog', done: false });
+todos.add({ id: 1, text: 'Buy groceries', done: false });
+todos.add({ id: 2, text: 'Clean house', done: false });
+todos.add({ id: 3, text: 'Walk dog', done: false });
 
 // Mark one as done
-todos.$update(item => item.id === 2, { done: true });
+todos.update(item => item.id === 2, { done: true });
 
 // Remove completed
-todos.$remove(item => item.done);
+todos.remove(item => item.done);
 
 // Clear all
-todos.$clear();
+todos.clear();
 ```
 
 ### Also available as `list()`
@@ -211,41 +211,41 @@ console.log(loginForm.isValid);      // true (computed — no errors)
 console.log(loginForm.isDirty);      // false (computed — no touched fields)
 ```
 
-### $setValue() — Set a field value
+### setValue() — Set a field value
 
 ```javascript
-loginForm.$setValue('email', 'alice@example.com');
+loginForm.setValue('email', 'alice@example.com');
 
 console.log(loginForm.values.email);    // 'alice@example.com'
 console.log(loginForm.touched.email);   // true (auto-marked)
 console.log(loginForm.isDirty);         // true (has touched fields)
 ```
 
-### $setError() — Set or clear an error
+### setError() — Set or clear an error
 
 ```javascript
 // Set an error
-loginForm.$setError('email', 'Invalid email address');
+loginForm.setError('email', 'Invalid email address');
 console.log(loginForm.errors.email);  // 'Invalid email address'
 console.log(loginForm.isValid);       // false
 
 // Clear an error
-loginForm.$setError('email', null);
+loginForm.setError('email', null);
 console.log(loginForm.errors.email);  // undefined
 console.log(loginForm.isValid);       // true
 ```
 
-### $reset() — Reset the form
+### reset() — Reset the form
 
 ```javascript
 // Reset to initial values
-loginForm.$reset();
+loginForm.reset();
 console.log(loginForm.values);   // { email: '', password: '' }
 console.log(loginForm.errors);   // {}
 console.log(loginForm.touched);  // {}
 
 // Reset to new values
-loginForm.$reset({ email: 'new@example.com', password: '' });
+loginForm.reset({ email: 'new@example.com', password: '' });
 ```
 
 ### Computed properties
@@ -273,21 +273,21 @@ const signupForm = form({
 // Validation
 function validate() {
   if (!signupForm.values.name) {
-    signupForm.$setError('name', 'Name is required');
+    signupForm.setError('name', 'Name is required');
   } else {
-    signupForm.$setError('name', null);
+    signupForm.setError('name', null);
   }
 
   if (!signupForm.values.email.includes('@')) {
-    signupForm.$setError('email', 'Invalid email');
+    signupForm.setError('email', 'Invalid email');
   } else {
-    signupForm.$setError('email', null);
+    signupForm.setError('email', null);
   }
 
   if (signupForm.values.password.length < 8) {
-    signupForm.$setError('password', 'Must be 8+ characters');
+    signupForm.setError('password', 'Must be 8+ characters');
   } else {
-    signupForm.$setError('password', null);
+    signupForm.setError('password', null);
   }
 }
 
@@ -323,10 +323,10 @@ console.log(users.isSuccess);  // false (computed)
 console.log(users.isError);    // false (computed)
 ```
 
-### $execute() — Run an async operation
+### execute() — Run an async operation
 
 ```javascript
-await users.$execute(async () => {
+await users.execute(async () => {
   const response = await fetch('/api/users');
   return response.json();
 });
@@ -336,10 +336,10 @@ console.log(users.loading);    // false
 console.log(users.isSuccess);  // true
 ```
 
-### What $execute() does automatically
+### What execute() does automatically
 
 ```
-users.$execute(asyncFn)
+users.execute(asyncFn)
    ↓
 1️⃣ Set loading = true
    ↓
@@ -352,10 +352,10 @@ users.$execute(asyncFn)
 4️⃣ Set loading = false (always, via finally)
 ```
 
-### $reset() — Reset to initial state
+### reset() — Reset to initial state
 
 ```javascript
-users.$reset();
+users.reset();
 console.log(users.data);     // null (or initial value)
 console.log(users.loading);  // false
 console.log(users.error);    // null
@@ -383,7 +383,7 @@ effect(() => {
 // Fetch users
 Elements.loadBtn.addEventListener('click', async () => {
   try {
-    await userList.$execute(async () => {
+    await userList.execute(async () => {
       const res = await fetch('/api/users');
       if (!res.ok) throw new Error('Failed to load');
       return res.json();
@@ -395,7 +395,7 @@ Elements.loadBtn.addEventListener('click', async () => {
 
 // Retry button
 Elements.retryBtn.addEventListener('click', () => {
-  userList.$reset();
+  userList.reset();
 });
 ```
 
@@ -404,7 +404,7 @@ Elements.retryBtn.addEventListener('click', () => {
 ## Key takeaways
 
 1. **ref()** — single reactive value with `.value`, good for counters, flags, selections
-2. **collection()** — reactive list with `$add`, `$remove`, `$update`, `$clear`
+2. **collection()** — reactive list with `add`, `remove`, `update`, `clear`
 3. **form()** — form state with values, errors, touched, computed `isValid` and `isDirty`
 4. **async()** — async state with data, loading, error, computed `isSuccess` and `isError`
 5. All factories return **reactive objects** — they work with effects, watchers, and computed

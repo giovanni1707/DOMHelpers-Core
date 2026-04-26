@@ -333,10 +333,10 @@ data.requestId → Internal counter for race condition prevention
 #### Built-in instance methods (from Module 06)
 
 ```javascript
-data.$execute(async (signal) => { /* fetch logic */ })  // run async operation
-data.$abort()     // cancel current operation
-data.$reset()     // reset to initial state
-data.$refetch()   // re-run last operation
+data.execute(async (signal) => { /* fetch logic */ })  // run async operation
+data.abort()     // cancel current operation
+data.reset()     // reset to initial state
+data.refetch()   // re-run last operation
 ```
 
 #### Example
@@ -362,7 +362,7 @@ effect(() => {
 });
 
 // Load the data
-posts.$execute(async (signal) => {
+posts.execute(async (signal) => {
   const response = await fetch('/api/posts', { signal });
   return response.json();
 });

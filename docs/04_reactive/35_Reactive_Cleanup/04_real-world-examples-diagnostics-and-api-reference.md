@@ -152,12 +152,12 @@ myCounter.increment();
 myCounter.increment();
 
 // When done with the counter:
-myCounter.$destroy();
-// Component teardown + $cleanup() runs automatically
+myCounter.destroy();
+// Component teardown + cleanup() runs automatically
 // Both effects are disposed
 ```
 
-**Key pattern:** Enhanced `$destroy()` automatically calls `$cleanup()` — no manual disposal needed.
+**Key pattern:** Enhanced `destroy()` automatically calls `cleanup()` — no manual disposal needed.
 
 ---
 
@@ -226,7 +226,7 @@ state.progress = 100;  // Logs: "Progress: 100%" and "Complete!"
 state.progress = 101;  // Nothing logged — watcher was disposed
 ```
 
-**Key pattern:** `$watch` returns a dispose function that can be called conditionally.
+**Key pattern:** `watch` returns a dispose function that can be called conditionally.
 
 ---
 
@@ -381,10 +381,10 @@ collector.add(() => socket.close());           // Connection cleanup
 ### ✅ Let components handle their own cleanup
 
 ```javascript
-// ✅ $destroy() automatically calls $cleanup()
+// ✅ destroy() automatically calls cleanup()
 const comp = component({ state: { ... } });
-// Just call $destroy() — no manual cleanup needed
-comp.$destroy();
+// Just call destroy() — no manual cleanup needed
+comp.destroy();
 ```
 
 ### ❌ Don't create effects without cleanup in dynamic contexts
@@ -414,17 +414,17 @@ function renderItem(item) {
 | Method | Change | Returns |
 |--------|--------|---------|
 | `effect(fn)` | Now supports disposal | `dispose()` function |
-| `state(obj)` | Adds `$cleanup` + tracked `watch`/`computed` | Reactive state |
+| `state(obj)` | Adds `cleanup` + tracked `watch`/`computed` | Reactive state |
 | `watch(state, key, fn)` | Now supports disposal | `dispose()` function |
 | `computed(state, { key: fn })` | Tracked for cleanup; old cleaned up on redefine | — |
-| `component.$destroy()` | Now calls `$cleanup()` automatically | — |
-| `builder.build().destroy()` | Now calls `$cleanup()` automatically | — |
+| `component.destroy()` | Now calls `cleanup()` automatically | — |
+| `builder.build().destroy()` | Now calls `cleanup()` automatically | — |
 
 ### New Instance Method
 
 | Method | Description |
 |--------|-------------|
-| `state.$cleanup()` | Dispose all effects and computed properties for this state |
+| `state.cleanup()` | Dispose all effects and computed properties for this state |
 
 ### Cleanup API (ReactiveCleanup)
 
@@ -497,9 +497,9 @@ scope(fn)   // Same as ReactiveCleanup.scope(fn)
 ├── STEP 1: Verify ReactiveUtils exists
 ├── STEP 2: Create effectRegistry + stateRegistry (WeakMaps)
 ├── STEP 3: Enhanced effect() with dispose support
-├── STEP 4: Enhanced state() with $cleanup, $watch, $computed
+├── STEP 4: Enhanced state() with cleanup, watch, computed
 ├── STEP 5: Patch state and .effect
-├── STEP 6: Enhanced component.$destroy
+├── STEP 6: Enhanced component.destroy
 ├── STEP 7: Enhanced reactive builder .destroy
 ├── STEP 8: Cleanup utilities (collector, scope, patchState, isActive)
 ├── STEP 9: Export to ReactiveCleanup + ReactiveUtils
@@ -513,8 +513,8 @@ scope(fn)   // Same as ReactiveCleanup.scope(fn)
 You've completed the Reactive Cleanup learning path. You now understand:
 
 - ✅ Why cleanup exists — preventing zombie effects and memory leaks
-- ✅ How `effect()` and `$watch()` return dispose functions
-- ✅ How `$cleanup()` disposes all effects for a state
+- ✅ How `effect()` and `watch()` return dispose functions
+- ✅ How `cleanup()` disposes all effects for a state
 - ✅ How collectors group multiple dispose functions
 - ✅ How scopes provide a clean setup-and-teardown pattern
 - ✅ How components and builders auto-cleanup on destroy

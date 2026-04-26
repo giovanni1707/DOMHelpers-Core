@@ -79,14 +79,14 @@ autoSave(settings, 'user-settings', {
 ### After `autoSave()`, the state gets extra methods
 
 ```javascript
-settings.$save();          // force save right now
-settings.$load();          // force load from storage
-settings.$clear();         // delete from storage
-settings.$exists();        // true if data exists in storage
-settings.$stopAutoSave();  // pause auto-saving
-settings.$startAutoSave(); // resume auto-saving
-settings.$storageInfo();   // get size, key, expiration info
-settings.$destroy();       // remove from storage and clean up
+settings.save();          // force save right now
+settings.load();          // force load from storage
+settings.clear();         // delete from storage
+settings.exists();        // true if data exists in storage
+settings.stopAutoSave();  // pause auto-saving
+settings.startAutoSave(); // resume auto-saving
+settings.storageInfo();   // get size, key, expiration info
+settings.destroy();       // remove from storage and clean up
 ```
 
 ### Example — save with expiration

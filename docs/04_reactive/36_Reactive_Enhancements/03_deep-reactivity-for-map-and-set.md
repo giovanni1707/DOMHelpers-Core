@@ -364,7 +364,7 @@ state.settings.set('theme', 'light');
 2. **Include Map/Set in initial state** — they're wrapped at creation time
 3. **Smart triggering** — only notifies when something actually changes (e.g., adding a duplicate to a Set is a no-op)
 4. **All read methods work** — `.get()`, `.has()`, `.size`, iteration all function normally
-5. **triggerUpdate** calls `state.$notify(key)` to re-run dependent effects
+5. **triggerUpdate** calls `state.notify(key)` to re-run dependent effects
 
 ---
 

@@ -81,14 +81,14 @@ The module creates two global objects and one global function:
 
 | Method | Syntax | Global equivalent |
 |--------|--------|-------------------|
-| `$computed(key, fn)` | `app.$computed('total', fn)` | `computed(app, { total: fn })` |
-| `$watch(keyOrFn, callback)` | `app.$watch('count', cb)` | `watch(app, 'count', cb)` |
-| `$batch(fn)` | `app.$batch(function() { ... })` | `batch(() => { ... })` |
-| `$update(updates)` | `app.$update({ count: 5 })` | *(instance-only)* |
-| `$set(updates)` | `app.$set({ count: c => c + 1 })` | *(instance-only)* |
-| `$bind(defs)` | `app.$bind({ '#el': 'count' })` | *(instance-only)* |
-| `$notify(key?)` | `app.$notify('items')` | `notify(app, 'items')` |
-| `$raw` | `app.$raw` | `toRaw(app)` |
+| `computed(key, fn)` | `app.computed('total', fn)` | `computed(app, { total: fn })` |
+| `watch(keyOrFn, callback)` | `app.watch('count', cb)` | `watch(app, 'count', cb)` |
+| `batch(fn)` | `app.batch(function() { ... })` | `batch(() => { ... })` |
+| `update(updates)` | `app.update({ count: 5 })` | *(instance-only)* |
+| `set(updates)` | `app.set({ count: c => c + 1 })` | *(instance-only)* |
+| `bind(defs)` | `app.bind({ '#el': 'count' })` | *(instance-only)* |
+| `notify(key?)` | `app.notify('items')` | `notify(app, 'items')` |
+| `raw` | `app.raw` | `toRaw(app)` |
 
 ---
 
@@ -209,8 +209,8 @@ mapEntries(prices, (fruit, price) => {
 | Calculate a derived value | `computed(app, { key: fn })` |
 | React when a property changes | `watch(app, 'key', callback)` |
 | Group multiple changes | `batch(fn)` |
-| Update state + DOM together | `app.$update({ ... })` *(instance-only)* |
-| Connect state to DOM elements | `app.$bind({ ... })` *(instance-only)* |
+| Update state + DOM together | `app.update({ ... })` *(instance-only)* |
+| Connect state to DOM elements | `app.bind({ ... })` *(instance-only)* |
 | Manage a list | `collection()` |
 | Handle form state | `form(initialValues)` |
 | Manage async operations | `asyncState(initial)` |
@@ -251,7 +251,7 @@ The reactive module detects `Elements`, `Collections`, and `Selector` at load ti
 
 1. **Two global objects:** `ReactiveUtils` (full API) and `ReactiveState` (simplified)
 2. **One global function:** `updateAll()` for mixed state + DOM updates
-3. **Instance methods** (`$computed`, `$watch`, `$batch`, etc.) are on every reactive object
+3. **Instance methods** (`computed`, `watch`, `batch`, etc.) are on every reactive object
 4. **DOMHelpers integration** adds the full API to `Elements`, `Collections`, and `Selector`
 5. **Specialized bind methods** on each DOMHelpers module (ID, class, CSS selector)
 6. **Iteration utilities** (`eachEntries`, `mapEntries`) for object iteration with optional DOM rendering

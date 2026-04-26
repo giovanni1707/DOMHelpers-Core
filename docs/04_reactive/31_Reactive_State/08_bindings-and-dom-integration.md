@@ -326,7 +326,7 @@ ReactiveUtils.updateAll(app, {
 });
 ```
 
-This is the functional equivalent of `app.$update()`.
+This is the functional equivalent of `app.update()`.
 
 ---
 

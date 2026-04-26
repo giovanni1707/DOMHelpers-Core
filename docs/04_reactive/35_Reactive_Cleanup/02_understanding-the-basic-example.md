@@ -49,15 +49,15 @@ state({ count: 0, name: 'Alice' })
 1️⃣ Calls the original state() to create the reactive proxy
    ↓
 2️⃣ Patches the state with cleanup tracking:
-   ├── Enhanced $watch (returns dispose)
-   ├── Enhanced $computed (tracked for cleanup)
-   ├── Adds $cleanup() method
+   ├── Enhanced watch (returns dispose)
+   ├── Enhanced computed (tracked for cleanup)
+   ├── Adds cleanup() method
    └── Marks as __cleanupPatched (prevents double-patching)
    ↓
 3️⃣ Returns the enhanced state
 ```
 
-The state now has a `$cleanup()` method that didn't exist before.
+The state now has a `cleanup()` method that didn't exist before.
 
 ---
 
@@ -179,14 +179,14 @@ The effect is completely removed from the system. It won't run, and it won't con
 
 ---
 
-## Using $watch with Cleanup
+## Using watch with Cleanup
 
-The `$watch` method is also enhanced to return a dispose function:
+The `watch` method is also enhanced to return a dispose function:
 
 ```javascript
 const state = state({ name: 'Alice' });
 
-// $watch now returns a dispose function
+// watch now returns a dispose function
 const stopWatching = watch(state, 'name', (newVal, oldVal) => {
   console.log(`Name changed: ${oldVal} → ${newVal}`);
 });
@@ -201,13 +201,13 @@ state.name = 'Charlie';
 // Nothing logged — watcher is disposed
 ```
 
-**How it works internally:** The enhanced `$watch` creates an `enhancedEffect` under the hood, so it gets the same disposal capabilities.
+**How it works internally:** The enhanced `watch` creates an `enhancedEffect` under the hood, so it gets the same disposal capabilities.
 
 ---
 
-## Using $cleanup on a State
+## Using cleanup on a State
 
-The `$cleanup()` method is the "nuclear option" — it disposes **all** effects associated with a state at once.
+The `cleanup()` method is the "nuclear option" — it disposes **all** effects associated with a state at once.
 
 ```javascript
 const state = state({ x: 0, y: 0 });
@@ -220,16 +220,16 @@ effect(() => console.log('sum:', state.x + state.y));
 state.x = 1;  // All three effects run
 
 // Clean up everything at once
-state.$cleanup();
+state.cleanup();
 
 state.x = 2;  // Nothing runs — all effects are disposed
 state.y = 3;  // Nothing runs
 ```
 
-**What $cleanup does:**
+**What cleanup does:**
 
 ```
-state.$cleanup()
+state.cleanup()
    ↓
 1️⃣ Cleans up all computed property cleanups
    ↓
@@ -260,13 +260,13 @@ dispose();  // Does nothing (already disposed)
 dispose();  // Does nothing (already disposed)
 ```
 
-The same is true for `$cleanup()` and collector `.cleanup()`. They all check their disposed flag before doing anything.
+The same is true for `cleanup()` and collector `.cleanup()`. They all check their disposed flag before doing anything.
 
 ---
 
-## Enhanced $computed with Cleanup
+## Enhanced computed with Cleanup
 
-The `$computed` method is also tracked. If you redefine a computed property, the old one is cleaned up first:
+The `computed` method is also tracked. If you redefine a computed property, the old one is cleaned up first:
 
 ```javascript
 const state = state({ items: [1, 2, 3] });
@@ -286,8 +286,8 @@ computed(state, { total: function() {
 } });
 console.log(state.total);  // 3
 
-// $cleanup removes computed properties too
-state.$cleanup();
+// cleanup removes computed properties too
+state.cleanup();
 ```
 
 ---
@@ -331,17 +331,17 @@ if (shouldStop) {
 }
 ```
 
-### ❌ Assuming $cleanup resets state values
+### ❌ Assuming cleanup resets state values
 
 ```javascript
 const state = state({ count: 5 });
 
-state.$cleanup();
+state.cleanup();
 
-// ❌ $cleanup does NOT reset values
+// ❌ cleanup does NOT reset values
 console.log(state.count);  // Still 5
 
-// $cleanup only removes effects and computed properties
+// cleanup only removes effects and computed properties
 // Values remain unchanged
 ```
 
@@ -350,10 +350,10 @@ console.log(state.count);  // Still 5
 ## Key Takeaways
 
 1. **`effect()` now returns a `dispose()` function** — call it to stop the effect
-2. **`$watch()` also returns a `dispose()` function** — same pattern
-3. **`state.$cleanup()`** disposes ALL effects and computed properties for that state
+2. **`watch()` also returns a `dispose()` function** — same pattern
+3. **`state.cleanup()`** disposes ALL effects and computed properties for that state
 4. **Dispose is idempotent** — calling it multiple times is safe
-5. **$cleanup does not reset values** — it only removes reactive subscriptions
+5. **cleanup does not reset values** — it only removes reactive subscriptions
 6. **Always capture `dispose`** when effects are temporary (dynamic UI, components, panels)
 7. **Two registries** (effectRegistry + stateRegistry) enable precise cleanup in both directions
 

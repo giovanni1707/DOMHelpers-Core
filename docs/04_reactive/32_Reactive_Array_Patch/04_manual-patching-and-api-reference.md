@@ -104,7 +104,7 @@ app.data.push(newItem);  // Triggers effects ✅
 
 ### Scenario 3: Arrays replaced with a new reference
 
-When you replace an array entirely, the automatic `$watch` should re-patch it. But if you need to be sure:
+When you replace an array entirely, the automatic `watch` should re-patch it. But if you need to be sure:
 
 ```javascript
 app.items = fetchedItems;
@@ -192,7 +192,7 @@ app.items = app.items.filter(i => i.active);  // Triggers effects ✅
 | Mechanism | What it does |
 |-----------|-------------|
 | `__patched` flag | Hidden boolean on each array, prevents double-patching |
-| `$watch(key, ...)` | Watches for array replacement, re-patches the new array |
+| `watch(key, ...)` | Watches for array replacement, re-patches the new array |
 | `[...this]` copy | After mutation, creates a copy and reassigns to trigger the set trap |
 
 ---
@@ -273,7 +273,7 @@ There's no built-in un-patch function. The `__patched` flag prevents re-patching
 | **Manual** | `ReactiveUtils.patchArray(state, key)` for arrays added later |
 | **Returns** | Original return values are preserved |
 | **Prevention** | `__patched` flag stops double-wrapping |
-| **Re-patch** | `$watch` detects array replacement and patches the new array |
+| **Re-patch** | `watch` detects array replacement and patches the new array |
 | **Non-mutating** | `filter`, `map`, `slice`, etc. — reassign the result instead |
 
 ---

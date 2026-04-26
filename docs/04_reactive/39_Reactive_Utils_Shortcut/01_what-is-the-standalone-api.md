@@ -239,7 +239,7 @@ If you load it too early, it won't find the advanced functions and they won't be
 |-------|------|--------|
 | Namespace | `ReactiveUtils.state({ count: 0 })` | ✅ Always |
 | Standalone | `state({ count: 0 })` | ✅ After loading shortcut |
-| Instance | `const s = state({}); s.$watch(...)` | ✅ Instance methods still work |
+| Instance | `const s = state({}); s.watch(...)` | ✅ Instance methods still work |
 
 All three styles can be used together. They all operate on the same underlying reactive system.
 

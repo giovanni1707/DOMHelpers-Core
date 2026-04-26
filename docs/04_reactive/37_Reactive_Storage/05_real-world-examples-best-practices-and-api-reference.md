@@ -54,7 +54,7 @@ autoSave(draft, 'blog-draft', {
 
 // Show "Draft saved" indicator
 effect(() => {
-  const exists = draft.$exists();
+  const exists = draft.exists();
   Elements.draftStatus.update({ textContent: exists ? 'Draft saved' : '' });
 });
 
@@ -62,13 +62,13 @@ effect(() => {
 async function publish() {
   const result = await draft.submit();
   if (result.success) {
-    draft.$clear();  // Remove from storage
+    draft.clear();  // Remove from storage
     draft.reset();   // Reset form
   }
 }
 ```
 
-**Key patterns:** `debounce` for typing, `onSave`/`onLoad` to transform data, `$clear` on publish
+**Key patterns:** `debounce` for typing, `onSave`/`onLoad` to transform data, `clear` on publish
 
 ---
 
@@ -210,8 +210,8 @@ autoSave(state, 'manual-data', {
 
 // Load when user clicks
 Elements.load.update({ onclick: () => { });
-  if (state.$exists()) {
-    state.$load();
+  if (state.exists()) {
+    state.load();
     console.log('Data loaded');
   } else {
     console.log('No saved data');
@@ -220,19 +220,19 @@ Elements.load.update({ onclick: () => { });
 
 // Save when user clicks
 Elements.save.update({ onclick: () => { });
-  state.$save();
-  const info = state.$storageInfo();
+  state.save();
+  const info = state.storageInfo();
   console.log(`Saved (${info.sizeKB}KB)`);
 };
 
 // Clear saved data
 Elements.clear.update({ onclick: () => { });
-  state.$clear();
+  state.clear();
   console.log('Cleared');
 };
 ```
 
-**Key patterns:** `autoSave: false`, `autoLoad: false`, manual `$save`/`$load`/`$clear`
+**Key patterns:** `autoSave: false`, `autoLoad: false`, manual `save`/`load`/`clear`
 
 ---
 
@@ -268,7 +268,7 @@ autoSave(state, 'cache', { expires: 7 * 24 * 3600 });
 autoSave(state, 'cache');
 ```
 
-### ✅ Call $destroy when done
+### ✅ Call destroy when done
 
 ```javascript
 // ✅ Clean up listeners and effects
@@ -277,7 +277,7 @@ function createWidget() {
   autoSave(state, 'widget');
   return {
     state,
-    destroy: () => state.$destroy()
+    destroy: () => state.destroy()
   };
 }
 ```
@@ -345,14 +345,14 @@ const state = state({
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `.$save()` | Boolean | Manual save |
-| `.$load()` | Boolean | Manual load |
-| `.$clear()` | Boolean | Remove from storage |
-| `.$exists()` | Boolean | Check if saved data exists |
-| `.$stopAutoSave()` | Object | Pause auto-save |
-| `.$startAutoSave()` | Object | Resume auto-save |
-| `.$destroy()` | — | Clean up everything |
-| `.$storageInfo()` | Object | Get storage details |
+| `.save()` | Boolean | Manual save |
+| `.load()` | Boolean | Manual load |
+| `.clear()` | Boolean | Remove from storage |
+| `.exists()` | Boolean | Check if saved data exists |
+| `.stopAutoSave()` | Object | Pause auto-save |
+| `.startAutoSave()` | Object | Resume auto-save |
+| `.destroy()` | — | Clean up everything |
+| `.storageInfo()` | Object | Get storage details |
 
 ---
 
@@ -462,7 +462,7 @@ You've completed the Reactive Storage learning path. You now understand:
 - ✅ What `autoSave` does and how it makes state persistent
 - ✅ How auto-load and auto-save work internally
 - ✅ All options: debounce, expiration, sync, namespaces, callbacks
-- ✅ All instance methods: $save, $load, $clear, $exists, $destroy
+- ✅ All instance methods: save, load, clear, exists, destroy
 - ✅ Production features: throttle, circular refs, size warnings, quota handling
 - ✅ `reactiveStorage` for reactive key-value storage access
 - ✅ `watch` for monitoring specific storage keys

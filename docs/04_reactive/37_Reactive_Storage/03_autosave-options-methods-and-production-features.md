@@ -109,7 +109,7 @@ autoSave(state, 'key', { autoSave: true });
 
 // Manual-only saving — no automatic saves
 autoSave(state, 'key', { autoSave: false });
-// Use state.$save() to save manually
+// Use state.save() to save manually
 ```
 
 ---
@@ -214,7 +214,7 @@ autoSave(state, 'data', {
 
 After calling `autoSave`, these methods are added to your reactive object:
 
-### .$save()
+### .save()
 
 Manually trigger a save. Useful when `autoSave: false` or when you want to force an immediate save.
 
@@ -224,7 +224,7 @@ autoSave(state, 'draft', { autoSave: false });
 
 // Save manually when the user clicks "Save Draft"
 Elements.saveDraft.update({ onclick: () => { });
-  state.$save();
+  state.save();
 };
 ```
 
@@ -232,13 +232,13 @@ Elements.saveDraft.update({ onclick: () => { });
 
 ---
 
-### .$load()
+### .load()
 
 Manually load from storage, overwriting current state.
 
 ```javascript
 // Reload from storage (e.g., after another tab changed it)
-state.$load();
+state.load();
 ```
 
 **Returns:** `true` if data was found and loaded, `false` if nothing was stored
@@ -247,12 +247,12 @@ During loading, the auto-save effect is temporarily paused (`isUpdatingFromStora
 
 ---
 
-### .$clear()
+### .clear()
 
 Remove this state's data from storage.
 
 ```javascript
-state.$clear();
+state.clear();
 // localStorage key 'my-key' is removed
 ```
 
@@ -260,12 +260,12 @@ state.$clear();
 
 ---
 
-### .$exists()
+### .exists()
 
 Check if saved data exists in storage.
 
 ```javascript
-if (state.$exists()) {
+if (state.exists()) {
   console.log('Saved data found');
 } else {
   console.log('No saved data');
@@ -276,16 +276,16 @@ if (state.$exists()) {
 
 ---
 
-### .$stopAutoSave()
+### .stopAutoSave()
 
-Pause the automatic saving effect. State changes won't be saved until `$startAutoSave()` is called.
+Pause the automatic saving effect. State changes won't be saved until `startAutoSave()` is called.
 
 ```javascript
-state.$stopAutoSave();
+state.stopAutoSave();
 
 state.count = 99;  // NOT saved
 
-state.$startAutoSave();
+state.startAutoSave();
 
 state.count = 100;  // Saved
 ```
@@ -294,24 +294,24 @@ state.count = 100;  // Saved
 
 ---
 
-### .$startAutoSave()
+### .startAutoSave()
 
 Resume automatic saving after it was stopped.
 
 ```javascript
-state.$startAutoSave();
+state.startAutoSave();
 ```
 
 **Returns:** the reactive object (for chaining)
 
 ---
 
-### .$destroy()
+### .destroy()
 
 Clean up everything: the auto-save effect, the storage event listener (for sync), and the beforeunload handler.
 
 ```javascript
-state.$destroy();
+state.destroy();
 // Effect disposed, event listeners removed, timeouts cleared
 ```
 
@@ -319,12 +319,12 @@ Always call this when you no longer need the auto-save (e.g., when removing a dy
 
 ---
 
-### .$storageInfo()
+### .storageInfo()
 
 Get information about the stored data.
 
 ```javascript
-const info = state.$storageInfo();
+const info = state.storageInfo();
 console.log(info);
 // {
 //   key: 'my-key',
@@ -422,8 +422,8 @@ syncLock = false
 ## Key Takeaways
 
 1. **Options control everything** — storage type, debounce, sync, expiration, callbacks
-2. **Instance methods** ($save, $load, $clear, $exists, $destroy) give you manual control
-3. **$destroy is important** — always call it when removing dynamic components
+2. **Instance methods** (save, load, clear, exists, destroy) give you manual control
+3. **destroy is important** — always call it when removing dynamic components
 4. **Debounce** prevents saving on every keystroke
 5. **Circular references** are handled safely
 6. **Size warnings** alert you before storage fills up

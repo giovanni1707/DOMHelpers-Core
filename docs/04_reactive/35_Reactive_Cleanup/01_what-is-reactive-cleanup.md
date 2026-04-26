@@ -149,7 +149,7 @@ effect(() => { ... })              effect(() => { ... })
 watch(state, key, fn)              watch(state, key, fn)
   → returns undefined                → returns dispose()
 
-No $cleanup method                 state.$cleanup()
+No cleanup method                 state.cleanup()
                                      → disposes ALL effects for this state
 
 No collector utility               ReactiveCleanup.collector()
@@ -158,11 +158,11 @@ No collector utility               ReactiveCleanup.collector()
 No scope utility                   ReactiveCleanup.scope(fn)
                                      → auto-collects disposals
 
-component.$destroy()               component.$destroy()
-  → basic teardown                   → teardown + $cleanup()
+component.destroy()               component.destroy()
+  → basic teardown                   → teardown + cleanup()
 
 reactive().build().destroy()       reactive().build().destroy()
-  → basic teardown                   → teardown + $cleanup()
+  → basic teardown                   → teardown + cleanup()
 ```
 
 ---
@@ -235,10 +235,10 @@ scope(fn)       // Same as ReactiveCleanup.scope()
 
 ```javascript
 effect(fn)      // Now returns dispose()
-state(obj)      // Now adds $cleanup()
+state(obj)      // Now adds cleanup()
 watch(state, key, fn)         // Now returns dispose()
 computed(state, { key: fn })  // Now tracked for cleanup
-component.$destroy()          // Now calls $cleanup() automatically
+component.destroy()          // Now calls cleanup() automatically
 ```
 
 ---
@@ -262,9 +262,9 @@ The cleanup module sits on top of the reactive core. It doesn't replace the reac
 ## Key Takeaways
 
 1. **Every `effect()` now returns a `dispose` function** that stops the effect from running
-2. **`state.$cleanup()`** disposes all effects associated with a state
+2. **`state.cleanup()`** disposes all effects associated with a state
 3. **WeakMaps** are used internally so garbage collection works naturally
-4. **Components and builders** automatically call `$cleanup()` on destroy
+4. **Components and builders** automatically call `cleanup()` on destroy
 5. **The cleanup system is transparent** — existing code works without changes, but now you can properly clean up when needed
 6. **No zombie effects** — disposed effects never run again, even if their dependencies change
 

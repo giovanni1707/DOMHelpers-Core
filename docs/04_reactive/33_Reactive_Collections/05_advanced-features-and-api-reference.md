@@ -332,7 +332,7 @@ Since collections are built on reactive state, all global reactive functions wor
 | `notify(state, 'key')` | Manually trigger effects for a key |
 | `toRaw(state)` | Access the raw (unproxied) data |
 
-Instance methods (`.$computed`, `.$watch`, `.$batch`, `.$update`, `.$set`, `.$bind`, `.$notify`, `.$raw`) are also available — see [instance methods](../31_Reactive_State/05_instance-methods.md).
+Instance methods (`computed`, `watch`, `.batch`, `.update`, `.set`, `.bind`, `.notify`, `.raw`) are also available — see [instance methods](../31_Reactive_State/05_instance-methods.md).
 
 ---
 
@@ -462,7 +462,7 @@ Use `.items` when you need reactivity (inside effects). Use `.toArray()` when yo
 | **Chainable** | Most methods return `this` for fluent APIs |
 | **Predicates** | Accept a value (exact match) or function (conditional match) |
 | **Reactive** | All mutations trigger effects automatically |
-| **Inherited** | Collections have all reactive instance methods ($computed, $watch, etc.) |
+| **Inherited** | Collections have all reactive instance methods (computed, watch, etc.) |
 
 ---
 

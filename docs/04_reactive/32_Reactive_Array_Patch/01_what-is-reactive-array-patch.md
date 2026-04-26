@@ -189,7 +189,7 @@ app.items = [10, 20, 30];  // New array — triggers effects
 app.items.push(40);  // Still triggers effects ✅
 ```
 
-This works because the module sets up a `$watch` on the property — when the value changes, it re-patches the new array.
+This works because the module sets up a `watch` on the property — when the value changes, it re-patches the new array.
 
 ---
 
@@ -268,7 +268,7 @@ app.newList.push('d');  // Triggers effects ✅
 2. **Solution:** The patch wraps each method to reassign the property after mutation
 3. **Automatic:** Just load the file — arrays in `state()` are patched automatically
 4. **Deep:** Nested arrays are also patched
-5. **Re-patching:** Replacing an array re-patches the new one via `$watch`
+5. **Re-patching:** Replacing an array re-patches the new one via `watch`
 6. **9 methods patched:** push, pop, shift, unshift, splice, sort, reverse, fill, copyWithin
 7. **No double-patching:** `__patched` flag prevents wrapping methods twice
 8. **Manual option:** `ReactiveUtils.patchArray(state, key)` for arrays added later

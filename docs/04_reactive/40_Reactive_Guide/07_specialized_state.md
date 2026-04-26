@@ -231,8 +231,8 @@ const loginForm = form({ email: '', password: '' });
 - `error` — any error that occurred (null if no error)
 - `isSuccess` — computed: data loaded, not loading, no error
 - `isError` — computed: not loading and error exists
-- `$execute(fn)` — run an async function and automatically manage loading/error/data
-- `$reset()` — reset back to initial state
+- `execute(fn)` — run an async function and automatically manage loading/error/data
+- `reset()` — reset back to initial state
 
 ```javascript
 const userState = async(null);
@@ -256,7 +256,7 @@ await execute(myAsyncState, async (signal) => {
 });
 
 // Or use the instance method
-await myAsyncState.$execute(async () => {
+await myAsyncState.execute(async () => {
   return await fetchSomeData();
 });
 ```
@@ -567,21 +567,21 @@ console.log(todoList.items[0].text); // "Buy groceries"
 ```javascript
 const tasks = collection([]);
 
-// $add — add an item
+// add — add an item
 tasks.add({ id: 1, text: 'First task', done: false });
 tasks.add({ id: 2, text: 'Second task', done: false });
 
-// $remove — remove by reference or predicate
+// remove — remove by reference or predicate
 tasks.remove(item => item.id === 1);   // Remove by condition
 tasks.remove(specificItem);            // Remove by reference
 
-// $update — update matching item
+// update — update matching item
 tasks.update(
   item => item.id === 2,               // Find condition
   { done: true }                        // Updates to apply
 );
 
-// $clear — remove all items
+// clear — remove all items
 tasks.clear();
 
 // Access the array directly
@@ -630,7 +630,7 @@ effect(() => {
 Id('shopping-list').addEventListener('change', (e) => {
   if (e.target.type === 'checkbox') {
     const id = parseInt(e.target.dataset.id);
-    shoppingList.$update(item => item.id === id, { checked: e.target.checked });
+    shoppingList.update(item => item.id === id, { checked: e.target.checked });
   }
 });
 
@@ -826,7 +826,7 @@ The reactive system provides purpose-built factories for common patterns:
 | `async(initial)` | Async operation state | `data`, `loading`, `error`, `isSuccess`, `isError` |
 | `store(state, opts)` | State with actions | `getters` (computed) + `actions` (methods) |
 | `component(config)` | Full UI component | state + computed + watch + effects + lifecycle |
-| `collection(items)` | Reactive list | `$add`, `$remove`, `$update`, `$clear` |
+| `collection(items)` | Reactive list | `add`, `remove`, `update`, `clear` |
 | `createState(state, bindings)` | State with DOM bindings | Automatic DOM sync |
 
 **The principle:** All factories are built on `state()`. They're conveniences, not replacements. You can always use `state()` + `computed()` + `effect()` + `watch()` to do everything yourself — factories just make common patterns faster and more consistent.

@@ -32,7 +32,7 @@ state({ count: 0, name: 'Alice' })
    ├── get trap → tracks reads (dependency collection)
    └── set trap → triggers updates (change notification)
    ↓
-5️⃣ Add instance methods ($computed, $watch, $batch, etc.)
+5️⃣ Add instance methods (computed, watch, batch, etc.)
    ↓
 6️⃣ Return the proxy
 ```

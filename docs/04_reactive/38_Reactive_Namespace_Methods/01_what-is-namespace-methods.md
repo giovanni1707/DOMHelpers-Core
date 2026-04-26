@@ -10,7 +10,7 @@
 const state = state({ count: 0 });
 
 // Instance style (with $):
-state.$set({ count: 5 });
+state.set({ count: 5 });
 
 // Namespace style (without $):
 ReactiveUtils.set(state, { count: 5 });
@@ -24,7 +24,7 @@ ReactiveUtils.set(state, { count: 5 });
 
 **Namespace Methods** is a module that adds **14 namespace-level functions** to `ReactiveUtils`. These functions let you call `$` instance methods using a different syntax — passing the state as the first argument instead of calling the method on the state itself.
 
-Simply put, instead of writing `state.$save()`, you can write `ReactiveUtils.save(state)`. Both do the same thing.
+Simply put, instead of writing `state.save()`, you can write `ReactiveUtils.save(state)`. Both do the same thing.
 
 ---
 
@@ -32,16 +32,16 @@ Simply put, instead of writing `state.$save()`, you can write `ReactiveUtils.sav
 
 ### Two Styles, Same Result
 
-Some developers prefer calling methods on a namespace (like `ReactiveUtils.save(state)`) rather than on the object itself (like `state.$save()`). This module gives you the choice.
+Some developers prefer calling methods on a namespace (like `ReactiveUtils.save(state)`) rather than on the object itself (like `state.save()`). This module gives you the choice.
 
 **Instance style (the `$` methods):**
 
 ```javascript
-state.$set({ count: 5 });
-state.$cleanup();
-state.$save();
-asyncState.$execute(fetchFn);
-component.$destroy();
+state.set({ count: 5 });
+state.cleanup();
+state.save();
+asyncState.execute(fetchFn);
+component.destroy();
 ```
 
 **Namespace style (this module adds these):**
@@ -58,7 +58,7 @@ ReactiveUtils.destroy(component);
 
 ```
 Instance style:                    Namespace style:
-state.$save()                      ReactiveUtils.save(state)
+state.save()                      ReactiveUtils.save(state)
 │                                  │
 ├── Method lives ON the object     ├── Method lives on the utility
 ├── Must check if method exists    ├── Validates internally
@@ -73,7 +73,7 @@ state.$save()                      ReactiveUtils.save(state)
 
 Think of instance methods like **asking a person directly**:
 
-> "Hey state, save yourself!" → `state.$save()`
+> "Hey state, save yourself!" → `state.save()`
 
 And namespace methods like **asking a manager**:
 
@@ -127,10 +127,10 @@ Each namespace method is a thin wrapper that:
 ```
 ReactiveUtils.save(state)
    ↓
-1️⃣ Does state exist? Does state.$save exist?
+1️⃣ Does state exist? Does state.save exist?
    ├── NO  → console.error, return false
    └── YES ↓
-2️⃣ return state.$save()
+2️⃣ return state.save()
 ```
 
 That's it. No magic, no transformation — just a convenient alias with built-in validation.
@@ -168,9 +168,9 @@ This module **adds** namespace methods — it does not **replace** instance meth
 
 ```javascript
 // Instance style — always works
-state.$save();
-state.$cleanup();
-asyncState.$execute(fn);
+state.save();
+state.cleanup();
+asyncState.execute(fn);
 
 // Namespace style — now also works
 ReactiveUtils.save(state);
@@ -185,10 +185,10 @@ ReactiveUtils.execute(asyncState, fn);
 ```
 DOMHelpers Reactive System
 │
-├── reactive module                  → Core (adds $set, $cleanup, $raw, etc.)
-├── 05_dh-reactive-cleanup.js        → Cleanup (adds $cleanup)
-├── 06_dh-reactive-enhancements.js   → Async (adds $execute, $abort, etc.)
-├── 07_dh-reactive-storage.js        → Storage (adds $save, $load, etc.)
+├── reactive module                  → Core (adds set, cleanup, raw, etc.)
+├── 05_dh-reactive-cleanup.js        → Cleanup (adds cleanup)
+├── 06_dh-reactive-enhancements.js   → Async (adds execute, abort, etc.)
+├── 07_dh-reactive-storage.js        → Storage (adds save, load, etc.)
 ├── 08_dh-reactive-namespace-methods → Aliases for all the above ← YOU ARE HERE
 ```
 
@@ -199,7 +199,7 @@ This module loads last and wraps all the `$` methods that previous modules added
 ## Key Takeaways
 
 1. **14 namespace-level methods** — aliases for `$` instance methods
-2. **Same functionality** — `ReactiveUtils.save(state)` is identical to `state.$save()`
+2. **Same functionality** — `ReactiveUtils.save(state)` is identical to `state.save()`
 3. **Built-in validation** — each method checks if the state has the required `$` method
 4. **Available everywhere** — ReactiveUtils, Elements, Collections, Selector, and globals
 5. **Non-destructive** — instance `$` methods still work as before

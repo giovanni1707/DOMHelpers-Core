@@ -101,18 +101,18 @@ const signup = form({
 watch(signup, 
   function() { return this.values.email; },
   (email) => {
-    if (!email) signup.$setError('email', null);
-    else if (!email.includes('@')) signup.$setError('email', 'Invalid email');
-    else signup.$setError('email', null);
+    if (!email) signup.setError('email', null);
+    else if (!email.includes('@')) signup.setError('email', 'Invalid email');
+    else signup.setError('email', null);
   }
 );
 
 watch(signup, 
   function() { return this.values.password; },
   (password) => {
-    if (!password) signup.$setError('password', null);
-    else if (password.length < 8) signup.$setError('password', '8+ characters required');
-    else signup.$setError('password', null);
+    if (!password) signup.setError('password', null);
+    else if (password.length < 8) signup.setError('password', '8+ characters required');
+    else signup.setError('password', null);
   }
 );
 
@@ -266,7 +266,7 @@ effect(() => {
 // Load button
 Elements.loadBtn.addEventListener('click', async () => {
   try {
-    await userData.$execute(async () => {
+    await userData.execute(async () => {
       const res = await fetch('/api/user/123');
       if (!res.ok) throw new Error('Failed to load user');
       return res.json();
@@ -495,7 +495,7 @@ watch(form, /* field */, /* validate */);
 
 ```javascript
 const data = async();
-await data.$execute(fetchFunction);
+await data.execute(fetchFunction);
 ```
 
 ---
@@ -508,8 +508,8 @@ await data.$execute(fetchFunction);
 4. Use **async()** for API calls with loading/error states
 5. Use **component()** for self-contained UI components with lifecycle
 6. Use **reactive() builder** when building incrementally
-7. **$batch()** when making multiple state changes that should trigger one update
-8. **$bind()** for declarative DOM bindings without manual effects
+7. **batch()** when making multiple state changes that should trigger one update
+8. **bind()** for declarative DOM bindings without manual effects
 
 ---
 

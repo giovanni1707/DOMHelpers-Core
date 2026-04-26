@@ -147,20 +147,20 @@ Level 1: Core Primitives
 Level 2: Derived State
 ├── computed()    → Values calculated from other state
 ├── watch()       → Callbacks that fire on changes
-└── $notify()     → Manually trigger updates on a state instance
+└── notify()     → Manually trigger updates on a state instance
 
 Level 3: Instance Methods (on the state object itself)
-├── .$computed()  → Add computed properties to a state instance
-├── .$watch()     → Watch a property on a state instance
-├── .$update()    → Update state + DOM in one call
-├── .$set()       → Functional updates with transformers
-├── .$bind()      → Connect state to DOM elements
-├── .$batch()     → Batch updates on a specific state instance
-└── .$raw         → Access the original unwrapped object
+├── .computed()  → Add computed properties to a state instance
+├── .watch()     → Watch a property on a state instance
+├── .update()    → Update state + DOM in one call
+├── .set()       → Functional updates with transformers
+├── .bind()      → Connect state to DOM elements
+├── .batch()     → Batch updates on a specific state instance
+└── .raw         → Access the original unwrapped object
 
 Level 4: Specialized Factories
 ├── ref()         → Single value with .value
-├── collection()  → Reactive lists with $add/$remove/$clear
+├── collection()  → Reactive lists with add/remove/clear
 ├── form()        → Form state with validation/errors/touched
 └── asyncState()  → Async state with loading/error/data
 

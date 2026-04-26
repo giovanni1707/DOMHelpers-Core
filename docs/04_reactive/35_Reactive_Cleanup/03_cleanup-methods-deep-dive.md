@@ -225,8 +225,8 @@ const oldState = someExistingState;
 // Patch it to add cleanup support
 ReactiveCleanup.patchState(oldState);
 
-// Now it has $cleanup()
-oldState.$cleanup();
+// Now it has cleanup()
+oldState.cleanup();
 ```
 
 **Returns:** the patched state
@@ -259,7 +259,7 @@ console.log(ReactiveCleanup.isActive(dispose));
 
 ### Components
 
-When the cleanup module loads, it enhances `component()` so that `$destroy()` automatically calls `$cleanup()`:
+When the cleanup module loads, it enhances `component()` so that `destroy()` automatically calls `cleanup()`:
 
 ```javascript
 const counter = component({
@@ -277,20 +277,20 @@ counter.increment();
 // Logs: "Component count: 1"
 
 // Destroy the component — effects are cleaned up automatically
-counter.$destroy();
+counter.destroy();
 
 counter.count = 99;
-// Nothing logged — $cleanup() was called inside $destroy()
+// Nothing logged — cleanup() was called inside destroy()
 ```
 
-**What happens inside the enhanced $destroy:**
+**What happens inside the enhanced destroy:**
 
 ```
-component.$destroy()
+component.destroy()
    ↓
-1️⃣ Calls the original $destroy() (teardown, lifecycle hooks)
+1️⃣ Calls the original destroy() (teardown, lifecycle hooks)
    ↓
-2️⃣ Calls this.$cleanup() (disposes all effects for this state)
+2️⃣ Calls this.cleanup() (disposes all effects for this state)
 ```
 
 ### Reactive Builder
@@ -346,7 +346,7 @@ state2 → {
 - effectRegistry: marks effectA as disposed, clears its states
 - stateRegistry: removes effectA from state1['count'], state1['name'], state2['items']
 
-**Calling state1.$cleanup():**
+**Calling state1.cleanup():**
 - stateRegistry: for every key in state1, disposes every effect
 - effectRegistry: each affected effect is fully unregistered
 
@@ -394,18 +394,18 @@ collector.add(dispose);
 collector.add(() => console.log('custom cleanup'));
 ```
 
-### ❌ Expecting $cleanup to reset state values
+### ❌ Expecting cleanup to reset state values
 
 ```javascript
 const state = state({ count: 5 });
 
-state.$cleanup();
+state.cleanup();
 
 // ❌ Values are NOT reset
 console.log(state.count);  // 5
 
-// $cleanup only removes effects and computed properties
-// To reset values, use $update or reassign manually
+// cleanup only removes effects and computed properties
+// To reset values, use update or reassign manually
 ```
 
 ---
@@ -416,7 +416,7 @@ console.log(state.count);  // 5
 2. **Scope** — shorthand for creating a collector, registering cleanups, and returning one dispose function
 3. **patchState** — manually adds cleanup support to an existing state
 4. **isActive** — checks if an effect is still running
-5. **Component $destroy** and **builder destroy** automatically call `$cleanup()`
+5. **Component destroy** and **builder destroy** automatically call `cleanup()`
 6. **Two WeakMap registries** enable bidirectional cleanup (effect → state and state → effects)
 7. **All cleanup operations are idempotent** — calling them multiple times is safe
 8. **Collector errors are caught** — one failing cleanup won't break the rest

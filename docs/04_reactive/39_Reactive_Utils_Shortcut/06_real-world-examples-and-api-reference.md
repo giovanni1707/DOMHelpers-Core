@@ -94,7 +94,7 @@ Elements.themeToggle.addEventListener('click', () => {
 
 // React to changes in OTHER tabs
 watchStorage('app-settings', () => {
-  settings.$load();  // reload from localStorage
+  settings.load();  // reload from localStorage
 });
 ```
 
@@ -242,7 +242,7 @@ function addToCart(item) {
 
 Elements.clearCart.addEventListener('click', () => {
   cart.items = [];
-  cart.$clear();  // also remove from localStorage
+  cart.clear();  // also remove from localStorage
 });
 ```
 
@@ -294,12 +294,12 @@ boundary.run(() => {
 const userState = asyncState(null);
 const statsState = asyncState(null);
 
-userState.$execute(async (signal) => {
+userState.execute(async (signal) => {
   const r = await fetch('/api/me', { signal });
   dashboard.user = await r.json();
 });
 
-statsState.$execute(async (signal) => {
+statsState.execute(async (signal) => {
   const r = await fetch('/api/stats', { signal });
   dashboard.stats = await r.json();
 });

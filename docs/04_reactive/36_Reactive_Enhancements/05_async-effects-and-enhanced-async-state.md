@@ -182,21 +182,21 @@ Returns a reactive state:
   isIdle: true,         // !loading && data === null && error === null
 
   // Methods:
-  $execute(fn),         // Run an async function
-  $abort(),             // Cancel current request
-  $reset(),             // Reset to initial state
-  $refetch()            // Re-run the last $execute function
+  execute(fn),         // Run an async function
+  abort(),             // Cancel current request
+  reset(),             // Reset to initial state
+  refetch()            // Re-run the last execute function
 }
 ```
 
 ---
 
-### $execute — Running Async Functions
+### execute — Running Async Functions
 
 ```javascript
 const users = asyncState([]);
 
-await users.$execute(async (signal) => {
+await users.execute(async (signal) => {
   const response = await fetch('/api/users', { signal });
   return response.json();
 });
@@ -206,10 +206,10 @@ console.log(users.loading);    // false
 console.log(users.isSuccess);  // true
 ```
 
-**What happens inside $execute:**
+**What happens inside execute:**
 
 ```
-users.$execute(fn)
+users.execute(fn)
    ↓
 1️⃣ Abort previous request (if any)
    ↓
@@ -245,14 +245,14 @@ The `requestId` pattern prevents stale responses from overwriting fresh data:
 const users = asyncState([]);
 
 // Request 1: fetch page 1
-users.$execute(async (signal) => {
+users.execute(async (signal) => {
   const res = await fetch('/api/users?page=1', { signal });
   return res.json();  // Takes 3 seconds
 });
 
 // 500ms later — user clicks "page 2"
 // Request 2: fetch page 2
-users.$execute(async (signal) => {
+users.execute(async (signal) => {
   const res = await fetch('/api/users?page=2', { signal });
   return res.json();  // Takes 1 second
 });
@@ -277,18 +277,18 @@ Request 1 would have finished later, but it was aborted
 
 ---
 
-### $abort — Cancelling a Request
+### abort — Cancelling a Request
 
 ```javascript
 const users = asyncState([]);
 
-users.$execute(async (signal) => {
+users.execute(async (signal) => {
   const res = await fetch('/api/users', { signal });
   return res.json();
 });
 
 // Cancel the request
-users.$abort();
+users.abort();
 
 console.log(users.loading);  // false
 console.log(users.data);     // [] (unchanged)
@@ -296,19 +296,19 @@ console.log(users.data);     // [] (unchanged)
 
 ---
 
-### $reset — Back to Initial State
+### reset — Back to Initial State
 
 ```javascript
 const users = asyncState([]);
 
-await users.$execute(async () => {
+await users.execute(async () => {
   return [{ name: 'Alice' }];
 });
 
 console.log(users.data);      // [{ name: 'Alice' }]
 console.log(users.isSuccess); // true
 
-users.$reset();
+users.reset();
 
 console.log(users.data);      // [] (initial value)
 console.log(users.loading);   // false
@@ -317,26 +317,26 @@ console.log(users.isIdle);    // true
 console.log(users.requestId); // 0
 ```
 
-`$reset` also aborts any in-flight request.
+`reset` also aborts any in-flight request.
 
 ---
 
-### $refetch — Re-run the Last Function
+### refetch — Re-run the Last Function
 
 ```javascript
 const users = asyncState([]);
 
-await users.$execute(async (signal) => {
+await users.execute(async (signal) => {
   const res = await fetch('/api/users', { signal });
   return res.json();
 });
 
 // Later, refresh the data with the same function:
-await users.$refetch();
-// Re-runs the last function passed to $execute
+await users.refetch();
+// Re-runs the last function passed to execute
 ```
 
-If no function was previously executed, `$refetch` returns:
+If no function was previously executed, `refetch` returns:
 ```javascript
 { success: false, error: Error('No function to refetch') }
 ```
@@ -380,7 +380,7 @@ effect(() => {
 
 // Fetch on button click
 Elements.loadBtn.update({ onclick: () => { });
-  users.$execute(async (signal) => {
+  users.execute(async (signal) => {
     const res = await fetch('/api/users', { signal });
     return res.json();
   });
@@ -388,7 +388,7 @@ Elements.loadBtn.update({ onclick: () => { });
 
 // Refresh button
 Elements.refreshBtn.update({ onclick: () => { });
-  users.$refetch();
+  users.refetch();
 };
 ```
 
@@ -436,23 +436,23 @@ asyncEffect(async (signal) => {
 });
 ```
 
-### ❌ Using asyncState without await on $execute
+### ❌ Using asyncState without await on execute
 
 ```javascript
 // ❌ Can't check the result synchronously
-const result = users.$execute(fetchFn);
+const result = users.execute(fetchFn);
 console.log(result);  // Promise, not the result
 
 // ✅ Use await
-const result = await users.$execute(fetchFn);
+const result = await users.execute(fetchFn);
 console.log(result);  // { success: true, data: [...] }
 ```
 
-### ❌ Ignoring the return value of $execute
+### ❌ Ignoring the return value of execute
 
 ```javascript
 // The return value tells you what happened
-const result = await users.$execute(fetchFn);
+const result = await users.execute(fetchFn);
 
 if (result.success) {
   console.log('Data:', result.data);
@@ -474,10 +474,10 @@ if (result.success) {
 3. **AbortError is silenced** — only real errors trigger error handlers
 4. **asyncState** — complete async data management (data, loading, error)
 5. **requestId pattern** — prevents race conditions where stale responses overwrite fresh data
-6. **$execute** — run async functions with cancellation and result tracking
-7. **$abort** — manually cancel in-flight requests
-8. **$refetch** — re-run the last function without re-specifying it
-9. **$reset** — return to initial state (also aborts)
+6. **execute** — run async functions with cancellation and result tracking
+7. **abort** — manually cancel in-flight requests
+8. **refetch** — re-run the last function without re-specifying it
+9. **reset** — return to initial state (also aborts)
 10. **Computed properties** (`.isSuccess`, `.isError`, `.isIdle`) make UI state simple
 
 ---

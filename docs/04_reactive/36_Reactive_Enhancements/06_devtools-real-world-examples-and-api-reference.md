@@ -249,7 +249,7 @@ const profile = asyncState(null, {
 
 // Load profile
 async function loadProfile(userId) {
-  await profile.$execute(async (signal) => {
+  await profile.execute(async (signal) => {
     const response = await fetch(`/api/users/${userId}`, { signal });
     if (!response.ok) throw new Error('User not found');
     return response.json();
@@ -261,7 +261,7 @@ effect(() => {
   let html;
   if (profile.isIdle)       html = '<p>Select a user</p>';
   else if (profile.loading) html = '<p>Loading profile...</p>';
-  else if (profile.isError) html = `<p>Error: ${profile.error.message}</p><button onclick="profile.$refetch()">Retry</button>`;
+  else if (profile.isError) html = `<p>Error: ${profile.error.message}</p><button onclick="profile.refetch()">Retry</button>`;
   else if (profile.isSuccess) html = `<h2>${profile.data.name}</h2><p>${profile.data.email}</p>`;
   Elements.profile.update({ innerHTML: html });
 });
@@ -271,7 +271,7 @@ loadProfile(1);
 loadProfile(2);  // User 1 request is aborted, user 2 loads
 ```
 
-**Key patterns:** `asyncState` with computed status properties, `$refetch` for retry, race condition prevention
+**Key patterns:** `asyncState` with computed status properties, `refetch` for retry, race condition prevention
 
 ---
 
@@ -341,12 +341,12 @@ loadProfile(2);  // User 1 request is aborted, user 2 loads
 
 | Method | Returns | Description |
 |--------|---------|-------------|
-| `.$execute(fn)` | Promise | Run async function with cancellation |
-| `.$abort()` | — | Cancel current request |
-| `.$reset()` | — | Reset to initial state (also aborts) |
-| `.$refetch()` | Promise | Re-run the last function |
+| `.execute(fn)` | Promise | Run async function with cancellation |
+| `.abort()` | — | Cancel current request |
+| `.reset()` | — | Reset to initial state (also aborts) |
+| `.refetch()` | Promise | Re-run the last function |
 
-**$execute return values:**
+**execute return values:**
 
 | Result | Shape |
 |--------|-------|
@@ -447,7 +447,7 @@ new ReactiveUtils.ErrorBoundary(options)
 </script>
 ```
 
-**Order matters:** Enhancements patch `state()` and `$computed`, so they must load after everything else.
+**Order matters:** Enhancements patch `state()` and `computed`, so they must load after everything else.
 
 ---
 

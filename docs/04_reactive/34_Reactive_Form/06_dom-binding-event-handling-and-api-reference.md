@@ -413,7 +413,7 @@ Since forms are built on reactive state, all global reactive functions work with
 | `notify(form, 'key')` | Manually trigger effects for a key |
 | `toRaw(form)` | Access the raw (unproxied) data |
 
-Instance methods (`.$computed`, `.$watch`, `.$batch`, `.$update`, `.$set`, `.$bind`, `.$notify`, `.$raw`) are also available — see [instance methods](../31_Reactive_State/05_instance-methods.md).
+Instance methods (`computed`, `watch`, `.batch`, `.update`, `.set`, `.bind`, `.notify`, `.raw`) are also available — see [instance methods](../31_Reactive_State/05_instance-methods.md).
 
 ---
 

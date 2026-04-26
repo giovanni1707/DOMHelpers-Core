@@ -441,6 +441,6 @@ watch(app, 'language', (newLang) => {
 
 ## What's next?
 
-Now let's explore the instance methods that every reactive object gets — including `$update()`, `$set()`, `$batch()`, and `$bind()` for cases where the instance-style API is preferred.
+Now let's explore the instance methods that every reactive object gets — including `update()`, `set()`, `batch()`, and `bind()` for cases where the instance-style API is preferred.
 
 Let's continue!

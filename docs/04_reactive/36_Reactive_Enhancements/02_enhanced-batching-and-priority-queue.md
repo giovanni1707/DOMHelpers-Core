@@ -120,7 +120,7 @@ state.count = 5;
    ↓
 2️⃣ queueUpdate() is called for each dependent:
    ├── 'doubled' computed    → added to queue at Priority 1
-   ├── $watch callback       → added to queue at Priority 2
+   ├── watch callback       → added to queue at Priority 2
    └── effect function       → added to queue at Priority 3
    ↓
 3️⃣ isFlushPending is false → schedule flush via queueMicrotask

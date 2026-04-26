@@ -150,7 +150,7 @@ const state = state({ x: 0, y: 0 });
 autoSave(state, 'position');
 
 // Instance style for quick, inline operations
-state.$set({ x: 100 });
+state.set({ x: 100 });
 
 // Namespace style for utility functions
 function saveAndReport(s) {
@@ -203,36 +203,36 @@ Note: Elements, Collections, Selector are only available if those modules are lo
 
 | Namespace Method | Instance Equivalent | Returns |
 |-----------------|-------------------|---------|
-| `ReactiveUtils.set(state, updates)` | `state.$set(updates)` | State |
-| `ReactiveUtils.cleanup(state)` | `state.$cleanup()` | undefined |
-| `ReactiveUtils.getRaw(state)` | `state.$raw` | Plain object |
+| `ReactiveUtils.set(state, updates)` | `state.set(updates)` | State |
+| `ReactiveUtils.cleanup(state)` | `state.cleanup()` | undefined |
+| `ReactiveUtils.getRaw(state)` | `state.raw` | Plain object |
 
 ### Async State
 
 | Namespace Method | Instance Equivalent | Returns |
 |-----------------|-------------------|---------|
-| `ReactiveUtils.execute(async, fn)` | `asyncState.$execute(fn)` | Promise |
-| `ReactiveUtils.abort(async)` | `asyncState.$abort()` | undefined |
-| `ReactiveUtils.reset(async)` | `asyncState.$reset()` | undefined |
-| `ReactiveUtils.refetch(async)` | `asyncState.$refetch()` | Promise |
+| `ReactiveUtils.execute(async, fn)` | `asyncState.execute(fn)` | Promise |
+| `ReactiveUtils.abort(async)` | `asyncState.abort()` | undefined |
+| `ReactiveUtils.reset(async)` | `asyncState.reset()` | undefined |
+| `ReactiveUtils.refetch(async)` | `asyncState.refetch()` | Promise |
 
 ### Component
 
 | Namespace Method | Instance Equivalent | Returns |
 |-----------------|-------------------|---------|
-| `ReactiveUtils.destroy(comp)` | `component.$destroy()` | undefined |
+| `ReactiveUtils.destroy(comp)` | `component.destroy()` | undefined |
 
 ### Storage
 
 | Namespace Method | Instance Equivalent | Returns |
 |-----------------|-------------------|---------|
-| `ReactiveUtils.save(state)` | `state.$save()` | Boolean |
-| `ReactiveUtils.load(state)` | `state.$load()` | Boolean |
-| `ReactiveUtils.clear(state)` | `state.$clear()` | Boolean |
-| `ReactiveUtils.exists(state)` | `state.$exists()` | Boolean |
-| `ReactiveUtils.stopAutoSave(state)` | `state.$stopAutoSave()` | State |
-| `ReactiveUtils.startAutoSave(state)` | `state.$startAutoSave()` | State |
-| `ReactiveUtils.storageInfo(state)` | `state.$storageInfo()` | Object |
+| `ReactiveUtils.save(state)` | `state.save()` | Boolean |
+| `ReactiveUtils.load(state)` | `state.load()` | Boolean |
+| `ReactiveUtils.clear(state)` | `state.clear()` | Boolean |
+| `ReactiveUtils.exists(state)` | `state.exists()` | Boolean |
+| `ReactiveUtils.stopAutoSave(state)` | `state.stopAutoSave()` | State |
+| `ReactiveUtils.startAutoSave(state)` | `state.startAutoSave()` | State |
+| `ReactiveUtils.storageInfo(state)` | `state.storageInfo()` | Object |
 
 ---
 

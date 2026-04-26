@@ -147,14 +147,14 @@ When you call `autoSave(state, key)`, it adds these methods to your reactive obj
 
 ```
 state (after autoSave)
-├── .$save()          → Manually trigger a save
-├── .$load()          → Manually load from storage
-├── .$clear()         → Remove this state from storage
-├── .$exists()        → Check if saved data exists
-├── .$stopAutoSave()  → Pause automatic saving
-├── .$startAutoSave() → Resume automatic saving
-├── .$destroy()       → Clean up all listeners and effects
-└── .$storageInfo()   → Get storage details (key, size, etc.)
+├── .save()          → Manually trigger a save
+├── .load()          → Manually load from storage
+├── .clear()         → Remove this state from storage
+├── .exists()        → Check if saved data exists
+├── .stopAutoSave()  → Pause automatic saving
+├── .startAutoSave() → Resume automatic saving
+├── .destroy()       → Clean up all listeners and effects
+└── .storageInfo()   → Get storage details (key, size, etc.)
 ```
 
 ---
@@ -175,7 +175,7 @@ autoSave detects your state type:
 ├── form (has .values)
 │   └── Saves/loads .values, .errors, .touched
 │
-├── state (has .$raw)
+├── state (has .raw)
 │   └── Saves/loads the raw state object
 │
 └── plain object
@@ -253,7 +253,7 @@ The module includes its own storage wrapper, so it doesn't depend on any externa
 4. **Works with all reactive types** — state, ref, collection, form
 5. **Production features** — debounce, expiration, cross-tab sync, error handling
 6. **Standalone** — only requires the reactive core, no external dependencies
-7. **Adds methods** like `$save`, `$load`, `$clear`, `$destroy` to your state
+7. **Adds methods** like `save`, `load`, `clear`, `destroy` to your state
 
 ---
 

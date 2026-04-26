@@ -84,7 +84,7 @@ state({ items: ['Apple', 'Banana'] })
    ↓
 4️⃣ __patched = true (prevents double-wrapping)
    ↓
-5️⃣ $watch('items', ...) set up for re-patching on replacement
+5️⃣ watch('items', ...) set up for re-patching on replacement
    ↓
 6️⃣ Return the reactive state
 ```

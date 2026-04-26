@@ -21,7 +21,7 @@ const stop = asyncEffect(async (signal) => {
 
 // Enhanced async state with race condition prevention
 const users = asyncState(null);
-await users.$execute(async (signal) => {
+await users.execute(async (signal) => {
   const res = await fetch('/api/users', { signal });
   return res.json();
 });
@@ -204,7 +204,7 @@ The enhancements module loads last and patches everything above. It depends on t
 │
 ├── PART 5: Async Support
 │   ├── asyncEffect() — effect with AbortSignal
-│   └── asyncState() — state with $execute, $abort, $reset, $refetch
+│   └── asyncState() — state with execute, abort, reset, refetch
 │
 └── PART 6: DevTools
     ├── trackState(), trackEffect(), logChange()
