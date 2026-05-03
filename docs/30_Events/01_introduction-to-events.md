@@ -4,41 +4,46 @@
 
 # Events in DOM Helpers
 
-Events are the heartbeat of any interactive web page. Every click, every keypress, every form submission — all of it flows through the browser's event system. DOM Helpers gives you a cleaner, more expressive way to work with that system without sacrificing any of its power.
+Every interactive thing on a web page runs on events. A button click, a form submission, a key being pressed, a mouse hovering over a card — all of it flows through the browser's event system.
+
+DOM Helpers doesn't replace that system. It makes it easier to work with — less repetition, cleaner code, and a few genuinely useful extras built in.
 
 ---
 
-## What This Section Covers
+## Why This Section Exists
 
-This guide is a dedicated deep dive into how DOM Helpers handles events across all three entry points — `Elements`, `Collections`, and `Selector`. It covers:
+If you've written plain JavaScript before, you already know `addEventListener`. You've probably also felt the friction of calling it separately for every event on every element. DOM Helpers gives you a better way — and this section explains exactly how it works, from the basics all the way to real patterns you'll reach for in production.
 
-| Topic | What You'll Learn |
+Here's what's covered across these four pages:
+
+| Page | What You'll Learn |
 |---|---|
-| **Event Listeners** | How to attach, remove, and deduplicate listeners through `.update()` |
-| **Multiple Events** | Object format for wiring up many event types in one declaration |
-| **Event Propagation** | How bubbling and capturing flow through the DOM tree |
-| **Controlling Propagation** | `stopPropagation`, `stopImmediatePropagation`, and `preventDefault` |
-| **Delegation** | Listening on a parent and filtering by target |
-| **`e.target.update()`** | The enhanced event object that lets you modify clicked elements inline |
-| **Once and Passive** | Listener options for auto-cleanup and scroll performance |
-| **Real-World Patterns** | Form validation, interactive cards, keyboard handling, and more |
+| **Introduction** *(this page)* | The core idea, the three input formats, and how `e.target.update()` works |
+| **Event Listeners** | Attaching, removing, deduplication, options, and events on collections |
+| **Propagation, Bubbling & Capturing** | How events travel through the DOM and how to control that journey |
+| **Advanced Patterns & Best Practices** | Real-world compositions: forms, keyboards, custom events, cleanup |
 
 ---
 
 ## The Core Idea
 
-In plain JavaScript, every event binding is a separate imperative call. Three events on one element means three lines of near-identical boilerplate:
+In plain JavaScript, attaching multiple events to one element means one call per event — every time:
 
 ```js
+// Plain JS — three separate calls for one element
 const btn = document.getElementById('btn');
+
 btn.addEventListener('click',      handleClick);
 btn.addEventListener('mouseenter', handleHover);
 btn.addEventListener('keydown',    handleKey);
 ```
 
-In DOM Helpers, all three live in a single `.update()` declaration:
+There's nothing wrong with this. But it gets repetitive fast. If you have five events, you write five lines. If you have ten elements, you write fifty.
+
+With DOM Helpers, all three events live in one place:
 
 ```js
+// DOM Helpers — one call, all three events
 Elements.btn.update({
   addEventListener: {
     click:      handleClick,
@@ -48,17 +53,19 @@ Elements.btn.update({
 });
 ```
 
-The same object-driven pattern applies everywhere: single elements via `Elements`, matched sets via `Collections`, and CSS-selector results via `Selector`. You write the same shape of code regardless of how many elements you are working with.
+Each key in the object is an event name. Each value is the handler function. One declaration, no repetition.
+
+This same pattern works whether you're targeting a single element (`Elements`), a group of elements (`Collections`), or elements found with a CSS selector (`Selector`). The API is consistent across all three.
 
 ---
 
-## Three Input Formats for `addEventListener`
+## Three Ways to Attach a Listener
 
-The `addEventListener` key inside `.update()` accepts three formats — you choose based on how many events you need and whether you need options:
+The `addEventListener` key accepts three different formats. Which one you use depends on how many events you need and whether you need options like `once` or `passive`.
 
-### Format 1 — Single event, no options
+### Format 1 — One event, no options
 
-Pass an array of `[eventType, handler]`:
+Pass an array with the event name and the handler function:
 
 ```js
 Elements.btn.update({
@@ -66,19 +73,24 @@ Elements.btn.update({
 });
 ```
 
-### Format 2 — Single event with options
+Simple and direct. This is exactly what `element.addEventListener('click', handleClick)` does — just written through the update system.
 
-Pass an array of `[eventType, handler, options]`:
+### Format 2 — One event with options
+
+Add a third item to the array — an options object:
 
 ```js
 Elements.btn.update({
-  addEventListener: ['click', handleClick, { once: true, passive: false }]
+  addEventListener: ['click', handleClick, { once: true }]
 });
+// This listener will fire once, then automatically remove itself
 ```
+
+All native `addEventListener` options are supported: `once`, `passive`, `capture`, and `signal`. You'll see each of these explained in the Event Listeners page.
 
 ### Format 3 — Multiple events at once
 
-Pass an object where each key is an event type and each value is a handler:
+Pass an object where each key is an event name:
 
 ```js
 Elements.card.update({
@@ -92,72 +104,90 @@ Elements.card.update({
 });
 ```
 
-| Format | Syntax | Best For |
-|---|---|---|
-| Array (no options) | `['click', fn]` | Simple, one-off bindings |
-| Array (with options) | `['click', fn, { once: true }]` | Listener options needed |
-| Object | `{ click: fn, mouseenter: fn }` | Multiple events on one element |
+Five events, one call. This is the format you'll use most often when building interactive components.
+
+**Quick comparison:**
+
+| Format | When to Use |
+|---|---|
+| `['click', fn]` | A single event, no options needed |
+| `['click', fn, { once: true }]` | A single event where you need options |
+| `{ click: fn, focus: fn }` | Two or more events on the same element |
 
 ---
 
-## `removeEventListener`
+## Removing a Listener
 
-Remove a previously registered listener by passing the same format used to add it:
+To remove a listener you added with `addEventListener`, use `removeEventListener` with the same event name and handler:
 
 ```js
-function handleClick(e) { /* ... */ }
+function handleClick(e) {
+  console.log('clicked!');
+}
 
-// Add
+// Add the listener
 Elements.btn.update({ addEventListener: ['click', handleClick] });
 
-// Remove later
+// Remove it later
 Elements.btn.update({ removeEventListener: ['click', handleClick] });
 ```
 
-The same function reference must be used — anonymous functions cannot be removed because each arrow function expression creates a new reference.
+**One important rule:** you must pass the *same function reference* to remove it. If you use an arrow function written inline, you can't remove it — because every time you write `() => {}`, JavaScript creates a brand new function, and the two are never considered equal.
 
 ```js
-// ❌ This cannot be cleaned up — no reference to remove
+// ❌ This won't work — two different arrow functions
 Elements.btn.update({
   addEventListener: ['click', () => doSomething()]
 });
+Elements.btn.update({
+  removeEventListener: ['click', () => doSomething()] // Not the same function!
+});
 
-// ✅ Named reference — removable
-function handleClick() { doSomething(); }
+// ✅ This works — same variable, same reference
+const handleClick = () => doSomething();
 
-Elements.btn.update({ addEventListener: ['click', handleClick] });
-// ... later ...
+Elements.btn.update({ addEventListener:    ['click', handleClick] });
 Elements.btn.update({ removeEventListener: ['click', handleClick] });
 ```
 
+If you know you'll need to remove a listener, save it in a variable.
+
 ---
 
-## Duplicate Prevention — Built In
+## Duplicate Prevention
 
-A subtle but important guarantee: registering the same handler function for the same event type more than once will **not** attach it twice. The library tracks every registered listener internally and skips re-registration if a match is found.
+Here's something DOM Helpers handles automatically that plain JavaScript does not: if you attach the same handler to the same event more than once, only one listener is ever registered.
 
 ```js
-function handleClick(e) { /* ... */ }
+function handleClick(e) {
+  console.log('clicked');
+}
 
-// Called 5 times — only one click listener ever attached
-for (let i = 0; i < 5; i++) {
+// Called 10 times — but only ONE click listener is ever attached
+for (let i = 0; i < 10; i++) {
   Elements.btn.update({ addEventListener: ['click', handleClick] });
 }
+// Clicking the button logs 'clicked' exactly once
 ```
 
-In plain JavaScript this would attach five listeners, causing the handler to fire five times on each click. DOM Helpers silently deduplicates, so your setup code can run repeatedly without worry.
+In plain JavaScript, that loop would register ten separate listeners. Each click would fire the handler ten times.
+
+DOM Helpers tracks every listener it registers and skips re-registration if the same function is already attached. This means you can safely call `.update()` inside a loop, a re-render, or any initialization code that might run more than once — without worrying about stacking duplicate listeners.
 
 ---
 
-## `e.target.update()` — The Enhanced Event Object
+## `e.target.update()` — Modify the Clicked Element Directly
 
-Every handler registered through `.update()` receives a standard `Event` object — with one enhancement: `e.target` automatically has `.update()` available on it. You can modify the element that received the event directly, without querying the DOM again.
+Every event handler you register through `.update()` receives the normal browser `Event` object — but with one helpful extra: `e.target` already has `.update()` available on it.
+
+This means you can modify the element the user interacted with, right inside the handler, without doing a separate DOM query to find it:
 
 ```js
 Elements.btn.update({
   addEventListener: {
     click: (e) => {
-      // No getElementById, no querySelector — the target is already enhanced
+      // e.target is the button that was clicked
+      // .update() is already there — no getElementById needed
       e.target.update({
         textContent: 'Clicked!',
         disabled:    true,
@@ -168,28 +198,28 @@ Elements.btn.update({
 });
 ```
 
-This is particularly useful inside delegated listeners where the target element is not known ahead of time:
+This is especially handy when the same handler is attached to many elements, because `e.target` always refers to the *specific element* that was interacted with:
 
 ```js
-Elements.list.update({
+// One listener handles clicks on every .item element in the list
+Collections.ClassName.item.update({
   addEventListener: {
     click: (e) => {
-      // e.target is whichever list item was clicked
+      // e.target is whichever item was clicked — not all of them
       e.target.update({
-        classList: { toggle: 'selected' },
-        dataset:   { selected: 'true' }
+        classList: { toggle: 'selected' }
       });
     }
   }
 });
 ```
 
+You get the right element, already enhanced, with no extra work.
+
 ---
 
 ## What's Next
 
-The following pages walk through each dimension of event handling in detail:
-
-- **[Event Listeners](./02_event-listeners)** — full coverage of attaching, removing, deduplication, options (`once`, `passive`, `capture`), and events on collections
-- **[Event Propagation, Bubbling & Capturing](./03_event-propagation-bubbling-capturing)** — how events travel through the DOM, how to control that flow, and event delegation patterns
-- **[Advanced Patterns & Best Practices](./04_advanced-patterns-and-best-practices)** — real-world compositions, keyboard handling, accessible interactions, and cleanup strategies
+- **[Event Listeners](./02_event-listeners)** — a full walkthrough of all the ways to attach and remove listeners, including options, collections, and the internal deduplication model
+- **[Propagation, Bubbling & Capturing](./03_event-propagation-bubbling-capturing)** — how events move through the DOM tree, how to intercept them, and how to use that behavior to your advantage
+- **[Advanced Patterns & Best Practices](./04_advanced-patterns-and-best-practices)** — real patterns you'll use in production: accessible components, keyboard handling, form validation, custom events, and listener cleanup

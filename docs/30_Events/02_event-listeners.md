@@ -4,18 +4,31 @@
 
 # Event Listeners
 
-This page covers everything about attaching and managing event listeners through DOM Helpers — single events, multiple events, listener options, deduplication, removal, and applying listeners across collections.
+This page is a complete guide to attaching and managing event listeners in DOM Helpers. We'll start with the simplest possible case and build up to the full feature set — including options, collections, deduplication, and cleanup.
 
 ---
 
-## The Plain JavaScript Problem
+## Starting Simple — One Event on One Element
 
-Before seeing the library's approach, it helps to see what you are replacing.
-
-### Attaching multiple events on a single element
+The simplest thing you can do is attach one listener to one element. The `addEventListener` key goes inside `.update()`, and the value is an array with the event name and the handler:
 
 ```js
-// Plain JS — one call per event, every time
+// The element with id="btn" gets a click listener
+Elements.btn.update({
+  addEventListener: ['click', handleClick]
+});
+```
+
+That's it. Under the hood this calls `element.addEventListener('click', handleClick)` — it's the same native API, just written through the update system so it can sit alongside other changes in one place.
+
+---
+
+## Multiple Events on One Element
+
+In plain JavaScript, adding five events to one element means five separate calls:
+
+```js
+// Plain JS — five lines of near-identical setup
 const card = document.getElementById('product-card');
 
 card.addEventListener('mouseenter', () => card.classList.add('hovered'));
@@ -25,38 +38,34 @@ card.addEventListener('focus',      () => card.setAttribute('aria-pressed', 'tru
 card.addEventListener('blur',       () => card.setAttribute('aria-pressed', 'false'));
 ```
 
-Five events, five nearly identical lines. Scaling to ten events means ten lines, all carrying the same repetition: `element.addEventListener(...)`.
-
-### Applying listeners to a set of elements
+DOM Helpers handles all five in one call using the object format — each key is an event name, each value is the handler:
 
 ```js
-// Plain JS — forEach per event type
-const buttons = document.querySelectorAll('.btn');
+Elements.card.update({
+  addEventListener: {
+    // Hover effects
+    mouseenter: () => Elements.card.update({ classList: { add: 'hovered' } }),
+    mouseleave: () => Elements.card.update({ classList: { remove: 'hovered' } }),
 
-buttons.forEach(btn => btn.addEventListener('click',  handleClick));
-buttons.forEach(btn => btn.addEventListener('focus',  handleFocus));
-buttons.forEach(btn => btn.addEventListener('blur',   handleBlur));
-```
+    // Toggle selection on click
+    click: () => Elements.card.update({ classList: { toggle: 'selected' } }),
 
-Three loops for three event types. The more events you need, the noisier this gets.
-
----
-
-## Attaching Listeners with `.update()`
-
-### Single event — array format
-
-```js
-Elements.btn.update({
-  addEventListener: ['click', handleClick]
+    // Update ARIA state for keyboard users
+    focus: (e) => e.target.update({ setAttribute: { 'aria-pressed': 'true' } }),
+    blur:  (e) => e.target.update({ setAttribute: { 'aria-pressed': 'false' } })
+  }
 });
 ```
 
-This directly calls `element.addEventListener('click', handleClick)` under the hood. It is the simplest form and works exactly like the native API.
+One call, five events. When you need to add more later, you just add another key to the same object — no new `addEventListener` calls needed.
 
-### Single event with options
+---
 
-Pass options as the third element of the array:
+## Listener Options
+
+Sometimes you need more control over how a listener behaves — when it fires, how the browser handles it, or how long it lives. That's what options are for.
+
+Add a third item to the array format to pass an options object:
 
 ```js
 Elements.btn.update({
@@ -64,67 +73,74 @@ Elements.btn.update({
 });
 ```
 
-All native `addEventListener` options are supported:
+Here are all the options you can use:
 
-| Option | Type | Effect |
-|---|---|---|
-| `once` | boolean | Listener fires once, then auto-removes itself |
-| `passive` | boolean | Handler will not call `preventDefault()` — browser optimizes scroll/touch |
-| `capture` | boolean | Listener fires during the capture phase (before bubbling) |
-| `signal` | AbortSignal | Listener auto-removes when the signal is aborted |
+| Option | What It Does |
+|---|---|
+| `once: true` | The listener fires **once**, then automatically removes itself — you don't have to clean it up manually |
+| `passive: true` | Tells the browser this listener will **never** call `preventDefault()`, so the browser can scroll and paint without waiting. Use this for scroll and touch events to avoid jank. |
+| `capture: true` | Makes the listener fire during the **capture phase** — before the event reaches the target element. Explained in detail on the Propagation page. |
+| `signal` | Pass an `AbortSignal` here and the listener will be **automatically removed** when you abort the controller. Great for cleaning up groups of listeners at once. |
+
+### `once: true` — fire and forget
 
 ```js
-// Once — fires one time, then gone
+// This handler runs one time when the modal's transition finishes, then disappears
 Elements.modal.update({
   addEventListener: ['transitionend', onModalOpened, { once: true }]
 });
+```
 
-// Passive — critical for scroll performance
+Without `{ once: true }`, you'd have to remove the listener manually from inside the handler. This is much cleaner.
+
+### `passive: true` — smooth scrolling
+
+```js
+// Telling the browser "we won't block scrolling here, go ahead and paint freely"
 Elements.scrollContainer.update({
-  addEventListener: ['scroll', onScroll, { passive: true }]
+  addEventListener: ['scroll', updateScrollPosition, { passive: true }]
 });
+```
 
-// Capture — fires before any child handlers
+Modern browsers warn you in the console if you attach scroll or touch listeners without `passive: true`, because it can cause noticeable scroll lag. Adding it is a quick win.
+
+### `capture: true` — intercept early
+
+```js
+// This listener fires before any handler on child elements
 Elements.overlay.update({
   addEventListener: ['click', closeOverlay, { capture: true }]
 });
+```
 
-// AbortSignal — controlled lifecycle
+This is covered fully in the [Propagation page](./03_event-propagation-bubbling-capturing). For now, just know the option exists.
+
+### `signal` — grouped cleanup with `AbortController`
+
+`AbortController` is a browser API that lets you cancel things — including event listeners. You create a controller, attach its `signal` to your listeners, and when you call `controller.abort()`, all of those listeners are removed at once:
+
+```js
+// Create a controller to manage the lifecycle of these listeners
 const controller = new AbortController();
-Elements.btn.update({
-  addEventListener: ['click', handleClick, { signal: controller.signal }]
+
+Elements.pauseBtn.update({
+  addEventListener: ['click', pauseSession, { signal: controller.signal }]
 });
-// Remove all signal-linked listeners at once:
+Elements.stopBtn.update({
+  addEventListener: ['click', stopSession, { signal: controller.signal }]
+});
+
+// Later — both listeners removed in one line
 controller.abort();
 ```
 
----
-
-### Multiple events — object format
-
-When you need more than one event type on the same element, use an object:
-
-```js
-Elements.card.update({
-  addEventListener: {
-    mouseenter: () => Elements.card.update({ classList: { add: 'hovered' } }),
-    mouseleave: () => Elements.card.update({ classList: { remove: 'hovered' } }),
-    click:      () => Elements.card.update({ classList: { toggle: 'selected' } }),
-    focus:      (e) => e.target.update({ setAttribute: { 'aria-pressed': 'true' } }),
-    blur:       (e) => e.target.update({ setAttribute: { 'aria-pressed': 'false' } })
-  }
-});
-```
-
-One `.update()` call, zero repetition. Every key is an event type, every value is a handler.
-
-The object format does not currently support per-event options (like `once` per individual key). When you need options, use the array format for that specific event alongside a separate `.update()`, or register those events individually.
+This is especially useful when you have a group of listeners that all belong to the same "session" or UI state, and you want to tear them all down cleanly when that state ends.
 
 ---
 
 ## Removing Listeners
 
-Use `removeEventListener` with the same `[eventType, handler]` array format:
+To remove a specific listener, use `removeEventListener` with the same event name and the same handler function:
 
 ```js
 function handleClick(e) {
@@ -134,40 +150,49 @@ function handleClick(e) {
 // Attach
 Elements.btn.update({ addEventListener: ['click', handleClick] });
 
-// Detach
+// Detach later
 Elements.btn.update({ removeEventListener: ['click', handleClick] });
 ```
 
-### Why the reference must match
+### The function reference rule
 
-JavaScript's `removeEventListener` requires the exact same function reference that was used to add the listener. Arrow functions defined inline create a new reference each time they are evaluated:
+This is the most important thing to understand about removing listeners: **you must pass the exact same function reference** that you used to add it.
+
+Every time you write `() => {}` or `function() {}` inline, JavaScript creates a brand new function object. Two arrow functions that look identical are not equal to each other:
 
 ```js
-// ❌ Cannot remove — new reference every call
+// ❌ This will NOT work
+// A new arrow function is created each time — they are different objects
 Elements.btn.update({
   addEventListener: ['click', () => console.log('clicked')]
 });
 Elements.btn.update({
-  removeEventListener: ['click', () => console.log('clicked')]  // Different reference
+  removeEventListener: ['click', () => console.log('clicked')] // Different function!
 });
 
-// ✅ Can remove — same reference stored in variable
+// ✅ This WILL work
+// Both calls use the same variable, which holds the same function object
 const logClick = () => console.log('clicked');
-Elements.btn.update({ addEventListener: ['click', logClick] });
+
+Elements.btn.update({ addEventListener:    ['click', logClick] });
 Elements.btn.update({ removeEventListener: ['click', logClick] });
 ```
 
-### Removing with `capture` option
+**Rule of thumb:** if you might need to remove a listener later, always save it in a named variable first.
 
-If a listener was added with `{ capture: true }`, it must also be removed with `{ capture: true }`:
+### Removing a capture-phase listener
+
+If you added a listener with `{ capture: true }`, you also need to include that option when removing it — otherwise the browser won't find the right listener:
 
 ```js
 function handleCapture(e) { /* ... */ }
 
+// Add with capture
 Elements.overlay.update({
   addEventListener: ['click', handleCapture, { capture: true }]
 });
 
+// Remove — must include capture: true to match
 Elements.overlay.update({
   removeEventListener: ['click', handleCapture, { capture: true }]
 });
@@ -175,48 +200,64 @@ Elements.overlay.update({
 
 ---
 
-## Deduplication — Never Register Twice
+## Automatic Deduplication
 
-Every listener registered through `.update()` is tracked by the library. Calling `.update()` again with the same event type and the same handler reference will not register a second listener — it is silently skipped.
+Here's something DOM Helpers handles for you that plain JavaScript doesn't: **registering the same listener twice does nothing the second time**.
 
 ```js
-function handleClick(e) { /* ... */ }
+function handleClick(e) {
+  console.log('clicked');
+}
 
-// Called 10 times in a loop — only one listener ever attached
+// Called inside a loop 10 times — but only ONE listener is ever attached
 for (let i = 0; i < 10; i++) {
   Elements.btn.update({ addEventListener: ['click', handleClick] });
 }
 
-// Clicking the button fires handleClick exactly once
+// Click the button → 'clicked' appears once in the console
 ```
 
-This is unlike the native `addEventListener`, which happily stacks duplicate listeners:
+Compare that with plain JavaScript:
 
 ```js
-// Plain JS — attaches 10 separate listeners
+// Plain JS — this attaches 10 separate listeners
 const btn = document.getElementById('btn');
 for (let i = 0; i < 10; i++) {
   btn.addEventListener('click', handleClick);
 }
-// Each click fires handleClick 10 times
+// Click the button → 'clicked' appears 10 times!
 ```
 
-Deduplication means you can safely call `.update()` inside reactive loops, re-renders, or initialization functions without worrying about listener accumulation.
+The library keeps an internal record of every listener it has registered. Before adding a new one, it checks: is this exact handler already attached to this exact event on this exact element? If yes, it skips it silently.
+
+Why does this matter? Because in real apps, setup code runs more than once — inside reactive loops, component re-mounts, or initialization functions that get called multiple times. Deduplication means you never have to worry about accidentally stacking listeners.
 
 ---
 
-## Events on Collections
+## Attaching Events to a Group of Elements
 
-Every collection in DOM Helpers supports `.update()`, which means you can attach events to a set of elements in a single call — no loop required.
-
-### By class name
+One of the most common tasks in JavaScript is doing the same thing across multiple elements — like attaching a click handler to every button on the page. In plain JavaScript you reach for `forEach`:
 
 ```js
-// Attach a click listener to every .btn element at once
+// Plain JS — loop per event type
+const buttons = document.querySelectorAll('.btn');
+
+buttons.forEach(btn => btn.addEventListener('click', handleClick));
+buttons.forEach(btn => btn.addEventListener('focus', handleFocus));
+buttons.forEach(btn => btn.addEventListener('blur',  handleBlur));
+```
+
+In DOM Helpers, `Collections` gives you a group of elements that already behaves like a single unit. Call `.update()` on the collection and it applies to every element inside it:
+
+### By CSS class
+
+```js
+// Attach click and focus listeners to every element with class="btn"
 Collections.ClassName.btn.update({
   addEventListener: {
     click: handleClick,
-    focus: handleFocus
+    focus: handleFocus,
+    blur:  handleBlur
   }
 });
 ```
@@ -224,7 +265,7 @@ Collections.ClassName.btn.update({
 ### By tag name
 
 ```js
-// Attach input handler to every <input> on the page
+// Attach an input handler to every <input> element on the page
 Collections.TagName.input.update({
   addEventListener: ['input', validateInput]
 });
@@ -233,41 +274,44 @@ Collections.TagName.input.update({
 ### By name attribute
 
 ```js
-// Attach change listener to every element with name="option"
+// Attach a change listener to every element with name="option"
 Collections.Name.option.update({
   addEventListener: ['change', handleOptionChange]
 });
 ```
 
-### Via Selector
+### Using Selector
+
+You can also query elements with a CSS selector and attach listeners to the result:
 
 ```js
-// Attach listeners to all required fields inside a specific form
+// Find all required fields inside a specific form, then attach listeners to all of them
 const fields = Selector.within(Elements.signupForm).queryAll('input[required]');
+
 fields.update({
   addEventListener: {
-    blur:   validateField,
-    focus:  clearFieldError
+    blur:  validateField,
+    focus: clearFieldError
   }
 });
 ```
 
-### The internal loop
-
-When you call `.update({ addEventListener: ... })` on a collection, the library iterates every element and calls `addEventListener` on each one — but deduplication still applies per element. If you call the same update again, no element gets a second listener.
+The library iterates over every element in the collection internally — you just describe what you want, and it handles the loop. Deduplication applies per element, so calling this multiple times is safe.
 
 ---
 
-## Events and `e.target.update()`
+## Using `e.target.update()` Inside Handlers
 
-Every handler function receives a standard DOM `Event` object. The library enhances `e.target` automatically, making `.update()` available on the element that received the event — without any additional lookup:
+When you attach a listener to a collection, every element in that collection gets the same handler function. But when the handler fires, how do you know *which specific element* was interacted with?
+
+That's what `e.target` is for. It's the specific element that triggered the event. And because DOM Helpers enhances it automatically, `.update()` is already available on it:
 
 ```js
 Collections.ClassName.item.update({
   addEventListener: {
     click: (e) => {
-      // e.target = the specific .item element that was clicked
-      // .update() is already available — no getElementById, no querySelector
+      // e.target = the specific .item that was clicked, not all of them
+      // .update() is already available — no querySelector needed
       e.target.update({
         classList: { toggle: 'active' },
         dataset:   { selected: 'true' }
@@ -277,25 +321,27 @@ Collections.ClassName.item.update({
 });
 ```
 
-This is especially powerful when the handler is shared across many elements: each invocation receives the specific element that triggered the event, and you modify it without any DOM query.
+Each time a user clicks a different item, `e.target` points to that item. You never need to re-query the DOM.
 
 ---
 
 ## Practical Patterns
 
-### Toggle active state on a group of tabs
+### Switch active tab
+
+A common UI pattern: click a tab to make it active, deactivate all others.
 
 ```js
 function activateTab(e) {
-  // Remove active from all tabs
+  // Step 1: deactivate every tab
   Collections.ClassName.tab.update({
-    classList: { remove: 'active' },
+    classList:    { remove: 'active' },
     setAttribute: { 'aria-selected': 'false' }
   });
 
-  // Activate only the clicked one
+  // Step 2: activate only the one that was clicked
   e.target.update({
-    classList: { add: 'active' },
+    classList:    { add: 'active' },
     setAttribute: { 'aria-selected': 'true' }
   });
 }
@@ -305,69 +351,72 @@ Collections.ClassName.tab.update({
 });
 ```
 
-### One-time setup confirmation
+### Run something once, then stop
 
 ```js
+// This handler fires the first time the user clicks "I agree", then never again
 Elements.agreeBtn.update({
   addEventListener: ['click', () => {
-    Elements.setupPanel.update({ style: { display: 'none' } });
+    Elements.welcomePanel.update({ style: { display: 'none' } });
     Elements.mainContent.update({ style: { display: 'block' } });
   }, { once: true }]
 });
 ```
 
-### Scroll tracking without jank
+### Track scroll position without hurting performance
 
 ```js
 Elements.page.update({
-  addEventListener: ['scroll', (e) => {
-    const y = window.scrollY;
+  addEventListener: ['scroll', () => {
+    const scrolled = window.scrollY > 80;
+
+    // Add or remove the 'scrolled' class based on position
     Elements.header.update({
-      classList: { toggle: 'scrolled' },
-      dataset:   { scrollY: String(Math.round(y)) }
+      classList: { [scrolled ? 'add' : 'remove']: 'scrolled' }
     });
-  }, { passive: true }]
+  }, { passive: true }]  // passive: true tells the browser we won't block scrolling
 });
 ```
 
-### Keyboard shortcut on the document
+### Respond to keyboard shortcuts from anywhere on the page
 
 ```js
 document.addEventListener('keydown', (e) => {
   if (e.key === 'Escape') {
+    // Close the modal if it's open
     Elements.modal.update({
-      classList:   { remove: 'open' },
+      classList:    { remove: 'open' },
       setAttribute: { 'aria-hidden': 'true' }
     });
-  }
-  if (e.key === 'Enter' && e.target.matches('.confirm-btn')) {
-    submitForm();
   }
 });
 ```
 
 ---
 
-## API Quick Reference
+## Quick Reference
 
-| Key | Value | Result |
+| Key | Value Shape | What Happens |
 |---|---|---|
-| `addEventListener` | `['click', fn]` | Attach single listener, no options |
-| `addEventListener` | `['click', fn, { once: true }]` | Attach with options |
-| `addEventListener` | `{ click: fn, focus: fn }` | Attach multiple listeners at once |
-| `removeEventListener` | `['click', fn]` | Remove previously attached listener |
-| `removeEventListener` | `['click', fn, { capture: true }]` | Remove capture-phase listener |
+| `addEventListener` | `['click', fn]` | Attaches a single listener |
+| `addEventListener` | `['click', fn, { once: true }]` | Attaches a listener with options |
+| `addEventListener` | `{ click: fn, focus: fn }` | Attaches multiple listeners at once |
+| `removeEventListener` | `['click', fn]` | Removes the listener |
+| `removeEventListener` | `['click', fn, { capture: true }]` | Removes a capture-phase listener |
 
 ---
 
 ## Summary
 
-- Use the **array format** (`['event', handler]`) for single events or when you need options
-- Use the **object format** (`{ event: handler }`) for multiple events — cleaner and zero repetition
-- **Store named references** for any handler you may need to remove later
-- **Deduplication is automatic** — the same handler on the same event type will not register twice
-- **Collections work identically** — `.update({ addEventListener: ... })` applies to every element in the set
-- **`e.target.update()`** lets you modify the event's target element without a DOM query
+Here's what to remember from this page:
+
+- **Array format** (`['click', fn]`) — for one event, optionally with options as a third item
+- **Object format** (`{ click: fn, focus: fn }`) — for multiple events on the same element, no loop needed
+- **Options** — `once`, `passive`, `capture`, and `signal` give you control over listener behavior and lifecycle
+- **To remove a listener**, use `removeEventListener` with the same function reference you used to add it
+- **Deduplication is automatic** — calling `.update()` with the same listener twice does nothing
+- **Collections** — `.update({ addEventListener: ... })` works on a group of elements just like it does on one
+- **`e.target.update()`** — the clicked element is always enhanced inside the handler
 
 ---
 
