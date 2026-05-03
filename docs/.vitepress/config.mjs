@@ -434,6 +434,29 @@ const fundamentalsSidebar = [
   },
 
   {
+    text: "Events",
+    collapsed: true,
+    items: [
+      {
+        text: "Introduction To Events",
+        link: "/30_Events/01_introduction-to-events",
+      },
+      {
+        text: "Event Listeners",
+        link: "/30_Events/02_event-listeners",
+      },
+      {
+        text: "Propagation, Bubbling & Capturing",
+        link: "/30_Events/03_event-propagation-bubbling-capturing",
+      },
+      {
+        text: "Advanced Patterns & Best Practices",
+        link: "/30_Events/04_advanced-patterns-and-best-practices",
+      },
+    ],
+  },
+
+  {
     text: "Statistics And Cache Management",
     collapsed: true,
     items: [
@@ -645,6 +668,7 @@ nav: [
       "/create-element": fundamentalsSidebar,
       "/native-enhance": fundamentalsSidebar,
       "/high-value-features": fundamentalsSidebar,
+      "/30_Events/": fundamentalsSidebar,
 
       "/10_spa/": [
         {
